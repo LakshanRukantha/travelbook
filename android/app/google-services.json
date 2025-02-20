@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "614466088796",
+    "project_id": "travelbook-28999",
+    "storage_bucket": "travelbook-28999.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:614466088796:android:a45af61bb93b9d683c1b99",
+        "android_client_info": {
+          "package_name": "com.example.travelbook"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzXS-m2b2ib51RNzGiwPC6ley6YWYT3F4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
