@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:travelbook/widgets/post_card.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -13,19 +14,27 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Travel Book"),
+        title: const Text("TravelBook"),
       ),
-      body: Center(
-        child: Column(
-          children: [
-            Text("Welcome to Travel Book"),
-            ElevatedButton(
-              onPressed: () {
-                context.pushNamed("/test");
-              },
-              child: const Text("Test Screen 01"),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              children: [
+                PostCard(),
+                PostCard(),
+                PostCard(),
+                PostCard(),
+                PostCard(),
+                PostCard(),
+                PostCard(),
+                PostCard(),
+                PostCard(),
+                PostCard(),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
