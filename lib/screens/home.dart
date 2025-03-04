@@ -1,24 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class TestScreen extends StatelessWidget {
-  const TestScreen({super.key});
+class Home extends StatefulWidget {
+  const Home({super.key});
 
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Test Screen'),
+        title: const Text("Travel Book"),
       ),
       body: Center(
         child: Column(
           children: [
-            Text('This is a test screen'),
+            Text("Welcome to Travel Book"),
             ElevatedButton(
               onPressed: () {
-                context.go('/');
+                context.pushNamed("/test");
               },
-              child: const Text('Back to Home'),
+              child: const Text("Test Screen 01"),
             ),
           ],
         ),
