@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 
 class PostCard extends StatelessWidget {
-  const PostCard({super.key});
+  const PostCard(
+      {super.key,
+      required this.name,
+      required this.location,
+      required this.imageUrl});
 
-  final name = "Lakshan Rukantha";
-  final location = "Badulla";
+  final String name;
+  final String location;
+  final String imageUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -18,25 +23,28 @@ class PostCard extends StatelessWidget {
               size: 45,
             ),
             SizedBox(width: 8),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "$name is at $location",
-                  style: TextStyle(fontSize: 18),
-                ),
-                Text(
-                  "2 hours ago",
-                  style: TextStyle(color: Colors.grey),
-                  textAlign: TextAlign.start,
-                ),
-              ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "$name is at $location",
+                    style: TextStyle(fontSize: 18),
+                    softWrap: true,
+                  ),
+                  Text(
+                    "2 hours ago",
+                    style: TextStyle(color: Colors.grey),
+                    textAlign: TextAlign.start,
+                  ),
+                ],
+              ),
             ),
           ],
         ),
         Card(
           child: Image.network(
-            "https://www.sankileisure.com/wp-content/uploads/2020/07/demodara-bridge.jpg",
+            imageUrl,
             width: double.infinity,
             height: 300,
             fit: BoxFit.cover,
@@ -50,6 +58,7 @@ class PostCard extends StatelessWidget {
                 "Today I visited Demodara Nine Arch Bridge. It was a great experience.",
                 style: TextStyle(fontSize: 16),
                 textAlign: TextAlign.start,
+                softWrap: true,
               ),
               SizedBox(height: 4),
               Row(
