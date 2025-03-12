@@ -9,28 +9,30 @@ class AboutUs extends StatelessWidget {
       appBar: AppBar(
         title: const Text("About Us"),
       ),
-      body: SingleChildScrollView( // Enables vertical scrolling
+      body: SingleChildScrollView(
+        // Enables vertical scrolling
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-             Center(
-  child: Container(
-    decoration: BoxDecoration(
-      shape: BoxShape.circle,
-       // Optional border
-    ),
-    child: ClipOval(
-      child: Image.asset(
-        "assets/images/logo.webp",
-        height: 80,
-        width: 80,
-        fit: BoxFit.cover, // Ensures the image fits within the circular shape
-      ),
-    ),
-  ),
-),
+              Center(
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    // Optional border
+                  ),
+                  child: ClipOval(
+                    child: Image.asset(
+                      "assets/images/logo.webp",
+                      height: 80,
+                      width: 80,
+                      fit: BoxFit
+                          .cover, // Ensures the image fits within the circular shape
+                    ),
+                  ),
+                ),
+              ),
               const SizedBox(height: 20),
               const Divider(
                 height: 2,
@@ -64,7 +66,8 @@ class AboutUs extends StatelessWidget {
                 children: const [
                   Icon(Icons.email),
                   SizedBox(width: 10),
-                  Text("contact@travelbook.com", style: TextStyle(fontSize: 20)),
+                  Text("contact@travelbook.com",
+                      style: TextStyle(fontSize: 20)),
                 ],
               ),
               const SizedBox(height: 20),
@@ -73,7 +76,6 @@ class AboutUs extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
               ),
               const SizedBox(height: 20),
-
               // Horizontal scrolling list for developers
               SizedBox(
                 height: 120,
