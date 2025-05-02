@@ -17,8 +17,14 @@ class BottomNavBar extends StatelessWidget {
           return 0;
         case '/test':
           return 1;
+        case '/test2':
+          return 2;
+        case '/settings':
+          return 3;
+        case '/profile':
+          return 4;
         default:
-          return -1; // Hide bottom nav if route not found
+          return 0; // Hide bottom nav if route not found
       }
     }
 
@@ -42,6 +48,18 @@ class BottomNavBar extends StatelessWidget {
             break;
           case 1:
             context.go('/test');
+            break;
+          case 2:
+            context.go('/test2');
+            break;
+          case 3:
+            context.go('/settings');
+            break;
+          case 4:
+            context.go('/profile');
+            break;
+          default:
+            context.go('/'); // Default case to home
             break;
         }
       },

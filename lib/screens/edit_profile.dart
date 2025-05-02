@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class EditProfilePage extends StatelessWidget {
   @override
@@ -9,7 +10,7 @@ class EditProfilePage extends StatelessWidget {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context);
+            context.pop();
           },
         ),
         backgroundColor: Colors.grey[300],
@@ -20,7 +21,8 @@ class EditProfilePage extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.all(16.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start, // Align content to the left
+              crossAxisAlignment:
+                  CrossAxisAlignment.start, // Align content to the left
               children: [
                 Center(
                   child: CircleAvatar(

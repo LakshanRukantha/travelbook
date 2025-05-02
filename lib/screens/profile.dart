@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 void main() {
   runApp(MyApp());
@@ -22,21 +23,39 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   String profileName = "Lakshan Rukantha";
   String profileEmail = "rukanthalakshan@gmail.com";
-  String profileImage = "assets/images/developers/user.webp"; // Default profile image
+  String profileImage =
+      "assets/images/developers/user.webp"; // Default profile image
 
   int postsCount = 3;
   int followersCount = 223;
   int followingCount = 546;
 
   List<Map<String, String>> posts = [
-    {"text": "Take only memories, leave only footprints", "likes": "120", "time": "6h ago", "image": "assets/images/posts/travel.webp"},
-    {"text": "Travel is the only thing you buy that makes you richer", "likes": "145", "time": "3h ago", "image": "assets/images/posts/travel1.webp"},
-    {"text": "Life is a journey, not a destination", "likes": "210", "time": "1d ago", "image": "assets/images/posts/travel2.webp"},
+    {
+      "text": "Take only memories, leave only footprints",
+      "likes": "120",
+      "time": "6h ago",
+      "image": "assets/images/posts/travel.webp"
+    },
+    {
+      "text": "Travel is the only thing you buy that makes you richer",
+      "likes": "145",
+      "time": "3h ago",
+      "image": "assets/images/posts/travel1.webp"
+    },
+    {
+      "text": "Life is a journey, not a destination",
+      "likes": "210",
+      "time": "1d ago",
+      "image": "assets/images/posts/travel2.webp"
+    },
   ];
 
   void _editProfile() {
-    TextEditingController nameController = TextEditingController(text: profileName);
-    TextEditingController emailController = TextEditingController(text: profileEmail);
+    TextEditingController nameController =
+        TextEditingController(text: profileName);
+    TextEditingController emailController =
+        TextEditingController(text: profileEmail);
 
     showDialog(
       context: context,
@@ -93,7 +112,8 @@ class _ProfilePageState extends State<ProfilePage> {
             mainAxisSize: MainAxisSize.min,
             children: profileImages.map((image) {
               return ListTile(
-                leading: Image.asset(image, width: 50, height: 50, fit: BoxFit.cover),
+                leading: Image.asset(image,
+                    width: 50, height: 50, fit: BoxFit.cover),
                 title: Text(image.split('/').last),
                 onTap: () {
                   setState(() {
@@ -218,7 +238,9 @@ class _ProfilePageState extends State<ProfilePage> {
             Text(profileEmail, style: TextStyle(color: Colors.grey)),
             SizedBox(height: 10),
             ElevatedButton(
-              onPressed: _editProfile,
+              onPressed: () {
+                context.pushNamed("edit_profile");
+              },
               child: Text("Edit Profile"),
             ),
             SizedBox(height: 20),
@@ -226,8 +248,10 @@ class _ProfilePageState extends State<ProfilePage> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 profileStat(postsCount.toString(), "Posts"),
-                profileStat(followersCount.toString(), "Followers", _updateFollowers),
-                profileStat(followingCount.toString(), "Following", _updateFollowing),
+                profileStat(
+                    followersCount.toString(), "Followers", _updateFollowers),
+                profileStat(
+                    followingCount.toString(), "Following", _updateFollowing),
               ],
             ),
             SizedBox(height: 20),
@@ -238,7 +262,10 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             SizedBox(height: 10),
             Column(
-              children: posts.map((post) => postItem(post["text"]!, post["likes"]!, post["time"]!, post["image"]!)).toList(),
+              children: posts
+                  .map((post) => postItem(post["text"]!, post["likes"]!,
+                      post["time"]!, post["image"]!))
+                  .toList(),
             ),
           ],
         ),
@@ -251,7 +278,8 @@ class _ProfilePageState extends State<ProfilePage> {
       onTap: onTap,
       child: Column(
         children: [
-          Text(count, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text(count,
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           Text(label, style: TextStyle(color: Colors.grey)),
         ],
       ),
