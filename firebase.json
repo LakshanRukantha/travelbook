@@ -1,0 +1,25 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "travelbook-28999",
+          "appId": "1:614466088796:android:a45af61bb93b9d683c1b99",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "travelbook-28999",
+          "configurations": {
+            "android": "1:614466088796:android:a45af61bb93b9d683c1b99",
+            "ios": "1:614466088796:ios:fc499bc4574330b83c1b99",
+            "macos": "1:614466088796:ios:fc499bc4574330b83c1b99",
+            "web": "1:614466088796:web:7dd330463776fd863c1b99",
+            "windows": "1:614466088796:web:a910db86a8236f5e3c1b99"
+          }
+        }
+      }
+    }
+  }
+}
