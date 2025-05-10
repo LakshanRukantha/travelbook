@@ -23,11 +23,36 @@ class _HomeState extends State<Home> {
       final snapshot =
           await FirebaseFirestore.instance.collection('posts').get();
       setState(() {
-        posts = snapshot.docs.map((doc) => doc.data()).toList();
+        posts = snapshot.docs.map((doc) {
+          var postData = doc.data();
+          postData['post_id'] = doc.id;
+          return postData;
+        }).toList();
       });
     } catch (e) {
       print("Error fetching posts: $e");
     }
+  }
+
+  Future<void> toggleLike(String postId, List<dynamic> likedUsers) async {
+    // Simulating user email for demonstration purposes
+    final userEmail = "rukanthalakshan@gmail.com";
+    if (userEmail == null) return;
+
+    final postRef = FirebaseFirestore.instance.collection('posts').doc(postId);
+    final isLiked = likedUsers.contains(userEmail);
+
+    await postRef.update({
+      'liked_users': isLiked
+          ? FieldValue.arrayRemove([userEmail])
+          : FieldValue.arrayUnion([userEmail]),
+    });
+
+    // After updating, fetch posts and notify the UI to rebuild
+    fetchPosts();
+
+    // Call setState to update the UI immediately
+    setState(() {});
   }
 
   @override
@@ -82,11 +107,17 @@ class _HomeState extends State<Home> {
               itemCount: posts.length,
               itemBuilder: (context, index) {
                 final post = posts[index];
+                final postId = post["post_id"] ?? "Unknown ID";
+                final likedUsers = post["liked_users"] ?? [];
+                print(likedUsers);
                 final name = post["name"] ?? "Unknown";
                 final location = post["location"] ?? "Unknown location";
                 final imageUrl = post["image"] ?? "";
                 final caption = post["caption"] ?? "";
                 final likes = post["likes"]?.toString() ?? "0";
+                // final userEmail = FirebaseAuth.instance.currentUser?.email;
+                final userEmail = "rukanthalakshan@gmail.com";
+                final isLiked = likedUsers.contains(userEmail);
 
                 return Card(
                   margin: const EdgeInsets.all(16),
@@ -147,11 +178,14 @@ class _HomeState extends State<Home> {
                                         ),
                                       ),
                                       IconButton(
-                                        icon: const Icon(Icons.favorite_border),
+                                        icon: Icon(
+                                          isLiked
+                                              ? Icons.favorite
+                                              : Icons.favorite_border,
+                                        ),
                                         color: Colors.white,
-                                        onPressed: () {
-                                          // Handle like action
-                                        },
+                                        onPressed: () =>
+                                            toggleLike(postId, likedUsers),
                                       ),
                                     ],
                                   ),
