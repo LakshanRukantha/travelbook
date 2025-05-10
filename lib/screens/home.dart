@@ -35,24 +35,31 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> toggleLike(String postId, List<dynamic> likedUsers) async {
-    // Simulating user email for demonstration purposes
     final userEmail = "rukanthalakshan@gmail.com";
     if (userEmail == null) return;
 
     final postRef = FirebaseFirestore.instance.collection('posts').doc(postId);
     final isLiked = likedUsers.contains(userEmail);
 
-    await postRef.update({
-      'liked_users': isLiked
-          ? FieldValue.arrayRemove([userEmail])
-          : FieldValue.arrayUnion([userEmail]),
-    });
+    try {
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        final snapshot = await transaction.get(postRef);
+        final currentLikes = snapshot['likes'] ?? 0;
 
-    // After updating, fetch posts and notify the UI to rebuild
-    fetchPosts();
+        final newLikes = isLiked ? currentLikes - 1 : currentLikes + 1;
 
-    // Call setState to update the UI immediately
-    setState(() {});
+        transaction.update(postRef, {
+          'liked_users': isLiked
+              ? FieldValue.arrayRemove([userEmail])
+              : FieldValue.arrayUnion([userEmail]),
+          'likes': newLikes < 0 ? 0 : newLikes,
+        });
+      });
+
+      await fetchPosts(); // Refresh posts after update
+    } catch (e) {
+      print("Failed to toggle like: $e");
+    }
   }
 
   @override
@@ -109,7 +116,6 @@ class _HomeState extends State<Home> {
                 final post = posts[index];
                 final postId = post["post_id"] ?? "Unknown ID";
                 final likedUsers = post["liked_users"] ?? [];
-                print(likedUsers);
                 final name = post["name"] ?? "Unknown";
                 final location = post["location"] ?? "Unknown location";
                 final imageUrl = post["image"] ?? "";
