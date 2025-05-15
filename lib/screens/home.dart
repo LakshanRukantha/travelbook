@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -10,11 +11,22 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  // List of posts
   List<Map<String, dynamic>> posts = [];
+  String userEmail = "";
+
+  // Currently logged-in user
+  User? user = FirebaseAuth.instance.currentUser;
 
   @override
   void initState() {
     super.initState();
+    print(user);
+    if (user != null) {
+      userEmail = user?.email ?? "Email not found";
+    } else {
+      print("User is null");
+    }
     fetchPosts();
   }
 
@@ -35,9 +47,6 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> toggleLike(String postId, List<dynamic> likedUsers) async {
-    final userEmail = "rukanthalakshan@gmail.com";
-    if (userEmail == null) return;
-
     final postRef = FirebaseFirestore.instance.collection('posts').doc(postId);
     final isLiked = likedUsers.contains(userEmail);
 
@@ -85,28 +94,39 @@ class _HomeState extends State<Home> {
         children: [
           Container(
             padding: const EdgeInsets.all(20),
-            child: const Text.rich(
-              TextSpan(
-                children: [
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text.rich(
                   TextSpan(
-                    text: "Welcome ",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
+                    children: [
+                      TextSpan(
+                        text: "Welcome ",
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      TextSpan(
+                        text: "${user?.displayName?.split(" ")[0]}!",
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ],
                   ),
-                  TextSpan(
-                    text: "Lakshan!",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue,
-                    ),
-                  ),
-                ],
-              ),
-              textAlign: TextAlign.left,
+                  textAlign: TextAlign.left,
+                ),
+                Text(userEmail,
+                    textAlign: TextAlign.left,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.black54,
+                    )),
+              ],
             ),
           ),
           Expanded(
@@ -121,8 +141,6 @@ class _HomeState extends State<Home> {
                 final imageUrl = post["image"] ?? "";
                 final caption = post["caption"] ?? "";
                 final likes = post["likes"]?.toString() ?? "0";
-                // final userEmail = FirebaseAuth.instance.currentUser?.email;
-                final userEmail = "rukanthalakshan@gmail.com";
                 final isLiked = likedUsers.contains(userEmail);
 
                 return Card(
@@ -163,7 +181,11 @@ class _HomeState extends State<Home> {
                       if (imageUrl.isNotEmpty)
                         Stack(
                           children: [
-                            Image.network(imageUrl),
+                            Image.network(
+                              imageUrl,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
                             Positioned(
                               top: 8,
                               right: 8,
