@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:travelbook/screens/chat_bot.dart';
 import 'package:travelbook/screens/edit_profile.dart';
 import 'package:travelbook/screens/home.dart';
 import 'package:travelbook/screens/profile.dart';
@@ -20,6 +21,10 @@ final GoRouter router = GoRouter(
             path: '/test',
             name: "/test",
             builder: (context, state) => const TestScreen()),
+        GoRoute(
+            path: '/chat',
+            name: "/chat",
+            builder: (context, state) => const ChatBot()),
         GoRoute(
           path: '/profile',
           name: "/profile",
