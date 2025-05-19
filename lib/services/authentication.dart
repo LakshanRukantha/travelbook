@@ -24,6 +24,12 @@ class AuthServices {
         'name': name,
         'email': email,
         'uid': credential.user!.uid,
+        'followers': [],
+        'following': [],
+        'location': '',
+        'bio': '',
+        'userImage':
+            'https://ui-avatars.com/api/?name=$name&background=random&size=128',
       });
       res = "success";
     } catch (e) {
