@@ -50,7 +50,7 @@ class BottomNavBar extends StatelessWidget {
             context.go('/test');
             break;
           case 2:
-            context.go('/test2');
+            context.go('/chat');
             break;
           case 3:
             context.go('/settings');
