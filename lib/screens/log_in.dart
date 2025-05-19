@@ -1,42 +1,45 @@
 import 'package:go_router/go_router.dart';
-import 'package:travelbook/Services/authentication.dart';
-import 'package:travelbook/widgets/button.dart';
+import 'package:travelbook/Widgets/button.dart';
+import 'package:travelbook/screens/home.dart';
 import 'package:travelbook/widgets/snack_bar.dart';
 import 'package:travelbook/widgets/text_field.dart';
-// import 'package:travelbook/screens/home.dart';
-import 'package:travelbook/screens/log_in.dart';
+import 'package:travelbook/screens/sign_up.dart';
 import 'package:flutter/material.dart';
 
-class SignUpscreen extends StatefulWidget {
-  const SignUpscreen({super.key});
+import '../services/authentication.dart';
+
+class Loginscreen extends StatefulWidget {
+  const Loginscreen({super.key});
 
   @override
-  State<SignUpscreen> createState() => _SignUpscreenState();
+  State<Loginscreen> createState() => _SignupscreenState();
 }
 
-class _SignUpscreenState extends State<SignUpscreen> {
+class _SignupscreenState extends State<Loginscreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController nameController = TextEditingController();
   bool isLoading = false;
 
-  void signUpUser() async {
+  void despose() {
+    super.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+  }
+
+  void loginUsers() async {
     setState(() {
       isLoading = true;
     });
 
-    String res = await AuthServices().signUpUser(
-      email: emailController.text,
-      password: passwordController.text,
-      name: nameController.text,
-    );
+    String res = await AuthServices().loginUser(
+        email: emailController.text, password: passwordController.text);
 
     setState(() {
       isLoading = false;
     });
 
     if (res == "success") {
-      showSnackBar(context, "Account created successfully!");
+      showSnackBar(context, "Login successfully!");
       Future.delayed(Duration.zero, () {
         print("Navigating to /test...");
         context.go('/');
@@ -56,11 +59,11 @@ class _SignUpscreenState extends State<SignUpscreen> {
           child: Column(
             children: [
               const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 35, vertical: 15),
+                padding: EdgeInsets.symmetric(horizontal: 35, vertical: 20),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    "Sign Up",
+                    "Log in",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 30,
@@ -74,20 +77,15 @@ class _SignUpscreenState extends State<SignUpscreen> {
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    "Explore beauty of SriLanka",
+                    "Welcome back to the app",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
                 ),
               ),
               SizedBox(
                 width: double.infinity,
-                height: height / 2.8,
-                child: Image.asset("assets/images/sign/signup.jpeg"),
-              ),
-              TextFieldInput(
-                textEditingController: nameController,
-                hintText: "Name",
-                icon: Icons.person,
+                height: height / 2.7,
+                child: Image.asset("assets/images/sign/login.jpg"),
               ),
               TextFieldInput(
                 textEditingController: emailController,
@@ -98,28 +96,45 @@ class _SignUpscreenState extends State<SignUpscreen> {
               TextFieldInput(
                 textEditingController: passwordController,
                 hintText: "Password",
-                // textInputType: String,
                 isPass: true,
+                // textInputType: String,
                 icon: Icons.lock,
               ),
-              MyButtons(onTap: signUpUser, text: "Sign up"),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 35),
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    "Forget Password?",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.blueAccent,
+                    ),
+                  ),
+                ),
+              ),
+              MyButtons(
+                onTap: loginUsers,
+                text: "Log in",
+              ),
               SizedBox(height: height / 100),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Already have an account?",
+                    "Don't have an account?",
                     style: TextStyle(fontSize: 16),
                   ),
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => Loginscreen()),
+                        MaterialPageRoute(builder: (context) => SignUpscreen()),
                       );
                     },
                     child: const Text(
-                      " Log in",
+                      " SignUp",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.blue,
