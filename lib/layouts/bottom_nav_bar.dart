@@ -7,17 +7,25 @@ class BottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Get the current route location
-    String currentRoute = GoRouterState.of(context).uri.toString();
+    // Get the current location from GoRouter
+    final String currentRoute = GoRouterState.of(context).uri.toString();
 
-    // App routes
+    // Define routes where the bottom nav should be hidden
+    final hideNavRoutes = ['/login', '/signup'];
+
+    // Hide bottom nav bar on specific routes
+    if (hideNavRoutes.contains(currentRoute)) {
+      return const SizedBox.shrink();
+    }
+
+    // Determine the current index based on route
     int getCurrentIndex() {
       switch (currentRoute) {
         case '/':
           return 0;
         case '/test':
           return 1;
-        case '/test2':
+        case '/chat':
           return 2;
         case '/settings':
           return 3;
@@ -44,7 +52,7 @@ class BottomNavBar extends StatelessWidget {
       onTap: (index) {
         switch (index) {
           case 0:
-            context.go('/'); // Use `go` for navigation inside bottom nav
+            context.go('/');
             break;
           case 1:
             context.go('/test');

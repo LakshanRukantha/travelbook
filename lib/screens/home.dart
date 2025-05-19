@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../services/authentication.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -11,22 +12,40 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  // List of posts
   List<Map<String, dynamic>> posts = [];
   String userEmail = "";
+  Map<String, dynamic>? user;
 
-  // Currently logged-in user
-  User? user = FirebaseAuth.instance.currentUser;
+  Future<Map<String, dynamic>?> getCurrentUser() async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final userDoc =
+        await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    if (userDoc.exists) {
+      return userDoc.data();
+    }
+    return null;
+  }
+
+  void fetchUserData() async {
+    Map<String, dynamic>? userData = await getCurrentUser();
+
+    if (userData != null) {
+      setState(() {
+        user = userData;
+        userEmail = FirebaseAuth.instance.currentUser!.email ?? '';
+      });
+      print("User name: ${userData['name']}");
+      print("User image: ${userData['userImage']}");
+    } else {
+      print("No user data found.");
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    print(user);
-    if (user != null) {
-      userEmail = user?.email ?? "Email not found";
-    } else {
-      print("User is null");
-    }
+    fetchUserData();
+    print("user: $user");
     fetchPosts();
   }
 
@@ -71,6 +90,15 @@ class _HomeState extends State<Home> {
     }
   }
 
+  String _capitalizeEachWord(String input) {
+    return input
+        .split(' ')
+        .map((word) => word.isNotEmpty
+            ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}'
+            : '')
+        .join(' ');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -82,9 +110,21 @@ class _HomeState extends State<Home> {
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications, color: Colors.white),
-            onPressed: () {
-              print("Notification button pressed");
+            onPressed: () async {
+              await AuthServices().signOutUser(context);
             },
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: user?['userImage'] != null && user!['userImage'].isNotEmpty
+                ? CircleAvatar(
+                    radius: 20,
+                    backgroundImage: NetworkImage(user!['userImage']),
+                  )
+                : const CircleAvatar(
+                    radius: 20,
+                    child: Icon(Icons.person, size: 24),
+                  ),
           ),
         ],
         backgroundColor: Colors.blue,
@@ -94,38 +134,53 @@ class _HomeState extends State<Home> {
         children: [
           Container(
             padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text.rich(
-                  TextSpan(
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      TextSpan(
-                        text: "Welcome ",
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                      Text.rich(
+                        TextSpan(
+                          children: [
+                            const TextSpan(
+                              text: "Welcome ",
+                              style: TextStyle(
+                                fontSize: 26,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            TextSpan(
+                              text:
+                                  "${_capitalizeEachWord(user?['name'].split(" ")[0] ?? '')}!",
+                              style: const TextStyle(
+                                fontSize: 26,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue,
+                              ),
+                            ),
+                          ],
+                        ),
+                        textAlign: TextAlign.left,
+                      ),
+                      Text(
+                        "Explore the beauty of Sri Lanka",
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.black54,
                         ),
                       ),
-                      TextSpan(
-                        text: "${user?.displayName?.split(" ")[0]}!",
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue,
-                        ),
-                      ),
+                      // Text(userEmail,
+                      //     textAlign: TextAlign.left,
+                      //     style: const TextStyle(
+                      //       fontSize: 16,
+                      //       color: Colors.black54,
+                      //     )),
                     ],
                   ),
-                  textAlign: TextAlign.left,
                 ),
-                Text(userEmail,
-                    textAlign: TextAlign.left,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.black54,
-                    )),
               ],
             ),
           ),
