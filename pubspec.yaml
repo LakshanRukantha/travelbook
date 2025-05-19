@@ -39,6 +39,7 @@ dependencies:
   go_router: ^14.8.1
   curved_navigation_bar: ^1.0.6
   firebase_auth: ^5.5.3
+  dash_chat_2: ^0.0.21
 
 dev_dependencies:
   flutter_test:
