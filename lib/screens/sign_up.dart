@@ -99,6 +99,7 @@ class _SignUpscreenState extends State<SignUpscreen> {
                 textEditingController: passwordController,
                 hintText: "Password",
                 // textInputType: String,
+                isPass: true,
                 icon: Icons.lock,
               ),
               MyButtons(onTap: signUpUser, text: "Sign up"),
