@@ -129,171 +129,174 @@ class _HomeState extends State<Home> {
         ],
         backgroundColor: Colors.blue,
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
+      body: user == null || posts == []
+          ? Center(child: CircularProgressIndicator(color: Colors.blue))
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text.rich(
-                        TextSpan(
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const TextSpan(
-                              text: "Welcome ",
-                              style: TextStyle(
-                                fontSize: 26,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  const TextSpan(
+                                    text: "Welcome ",
+                                    style: TextStyle(
+                                      fontSize: 26,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text:
+                                        "${_capitalizeEachWord(user?['name'].split(" ")[0] ?? '')}!",
+                                    style: const TextStyle(
+                                      fontSize: 26,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              textAlign: TextAlign.left,
+                            ),
+                            Text(
+                              "Explore the beauty of Sri Lanka",
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.black54,
                               ),
                             ),
-                            TextSpan(
-                              text:
-                                  "${_capitalizeEachWord(user?['name'].split(" ")[0] ?? '')}!",
-                              style: const TextStyle(
-                                fontSize: 26,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.blue,
+                            // Text(userEmail,
+                            //     textAlign: TextAlign.left,
+                            //     style: const TextStyle(
+                            //       fontSize: 16,
+                            //       color: Colors.black54,
+                            //     )),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: posts.length,
+                    itemBuilder: (context, index) {
+                      final post = posts[index];
+                      final postId = post["post_id"] ?? "Unknown ID";
+                      final likedUsers = post["liked_users"] ?? [];
+                      final name = post["name"] ?? "Unknown";
+                      final location = post["location"] ?? "Unknown location";
+                      final imageUrl = post["image"] ?? "";
+                      final caption = post["caption"] ?? "";
+                      final likes = post["likes"]?.toString() ?? "0";
+                      final isLiked = likedUsers.contains(userEmail);
+
+                      return Card(
+                        margin: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    name,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const Text(
+                                    " is at ",
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                  const Icon(
+                                    Icons.location_on,
+                                    size: 16,
+                                    color: Colors.red,
+                                  ),
+                                  Flexible(
+                                    child: Text(
+                                      location,
+                                      style: const TextStyle(fontSize: 16),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (imageUrl.isNotEmpty)
+                              Stack(
+                                children: [
+                                  Image.network(
+                                    imageUrl,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  Positioned(
+                                    top: 8,
+                                    right: 8,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.black26,
+                                        borderRadius: BorderRadius.circular(50),
+                                      ),
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 14),
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              likes,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                            IconButton(
+                                              icon: Icon(
+                                                isLiked
+                                                    ? Icons.favorite
+                                                    : Icons.favorite_border,
+                                              ),
+                                              color: Colors.white,
+                                              onPressed: () => toggleLike(
+                                                  postId, likedUsers),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                caption,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                ),
                               ),
                             ),
                           ],
                         ),
-                        textAlign: TextAlign.left,
-                      ),
-                      Text(
-                        "Explore the beauty of Sri Lanka",
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.black54,
-                        ),
-                      ),
-                      // Text(userEmail,
-                      //     textAlign: TextAlign.left,
-                      //     style: const TextStyle(
-                      //       fontSize: 16,
-                      //       color: Colors.black54,
-                      //     )),
-                    ],
+                      );
+                    },
                   ),
                 ),
               ],
             ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: posts.length,
-              itemBuilder: (context, index) {
-                final post = posts[index];
-                final postId = post["post_id"] ?? "Unknown ID";
-                final likedUsers = post["liked_users"] ?? [];
-                final name = post["name"] ?? "Unknown";
-                final location = post["location"] ?? "Unknown location";
-                final imageUrl = post["image"] ?? "";
-                final caption = post["caption"] ?? "";
-                final likes = post["likes"]?.toString() ?? "0";
-                final isLiked = likedUsers.contains(userEmail);
-
-                return Card(
-                  margin: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            Text(
-                              name,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const Text(
-                              " is at ",
-                              style: TextStyle(fontSize: 16),
-                            ),
-                            const Icon(
-                              Icons.location_on,
-                              size: 16,
-                              color: Colors.red,
-                            ),
-                            Flexible(
-                              child: Text(
-                                location,
-                                style: const TextStyle(fontSize: 16),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (imageUrl.isNotEmpty)
-                        Stack(
-                          children: [
-                            Image.network(
-                              imageUrl,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
-                            Positioned(
-                              top: 8,
-                              right: 8,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.black26,
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 14),
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        likes,
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                      IconButton(
-                                        icon: Icon(
-                                          isLiked
-                                              ? Icons.favorite
-                                              : Icons.favorite_border,
-                                        ),
-                                        color: Colors.white,
-                                        onPressed: () =>
-                                            toggleLike(postId, likedUsers),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          caption,
-                          style: const TextStyle(
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
