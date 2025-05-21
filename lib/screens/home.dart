@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import '../services/authentication.dart';
 
 class Home extends StatefulWidget {
@@ -17,7 +16,10 @@ class _HomeState extends State<Home> {
   Map<String, dynamic>? user;
 
   Future<Map<String, dynamic>?> getCurrentUser() async {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return null;
+    final uid = currentUser.uid;
+
     final userDoc =
         await FirebaseFirestore.instance.collection('users').doc(uid).get();
     if (userDoc.exists) {
@@ -29,7 +31,7 @@ class _HomeState extends State<Home> {
   void fetchUserData() async {
     Map<String, dynamic>? userData = await getCurrentUser();
 
-    if (userData != null) {
+    if (mounted && userData != null) {
       setState(() {
         user = userData;
         userEmail = FirebaseAuth.instance.currentUser!.email ?? '';
@@ -99,6 +101,22 @@ class _HomeState extends State<Home> {
         .join(' ');
   }
 
+  Future<String?> getUserProfileImage(String email) async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .get();
+
+      if (snapshot.docs.isNotEmpty) {
+        return snapshot.docs.first.data()['userImage'];
+      }
+    } catch (e) {
+      print("Error fetching user profile image: $e");
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -129,7 +147,7 @@ class _HomeState extends State<Home> {
         ],
         backgroundColor: Colors.blue,
       ),
-      body: user == null || posts == []
+      body: user == null || posts.isEmpty
           ? Center(child: CircularProgressIndicator(color: Colors.blue))
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,12 +192,6 @@ class _HomeState extends State<Home> {
                                 color: Colors.black54,
                               ),
                             ),
-                            // Text(userEmail,
-                            //     textAlign: TextAlign.left,
-                            //     style: const TextStyle(
-                            //       fontSize: 16,
-                            //       color: Colors.black54,
-                            //     )),
                           ],
                         ),
                       ),
@@ -199,6 +211,7 @@ class _HomeState extends State<Home> {
                       final caption = post["caption"] ?? "";
                       final likes = post["likes"]?.toString() ?? "0";
                       final isLiked = likedUsers.contains(userEmail);
+                      final postedBy = post["posted_by"] ?? "Unknown";
 
                       return Card(
                         margin: const EdgeInsets.all(16),
@@ -207,32 +220,130 @@ class _HomeState extends State<Home> {
                           children: [
                             Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Row(
-                                children: [
-                                  Text(
-                                    name,
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    // Profile Image
+                                    FutureBuilder<String?>(
+                                      future: getUserProfileImage(postedBy),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            child: Container(
+                                              width: 50,
+                                              height: 50,
+                                              color: Colors.grey[300],
+                                              child: const Center(
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                          color: Colors.blue,
+                                                          strokeWidth: 2)),
+                                            ),
+                                          );
+                                        }
+                                        if (snapshot.hasData &&
+                                            snapshot.data != null &&
+                                            snapshot.data!.isNotEmpty) {
+                                          return ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            child: Image.network(
+                                              snapshot.data!,
+                                              width: 50,
+                                              height: 50,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          );
+                                        }
+                                        return ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(25),
+                                          child: Container(
+                                            width: 50,
+                                            height: 50,
+                                            color: Colors.grey[300],
+                                            child: const Icon(Icons.person,
+                                                size: 30),
+                                          ),
+                                        );
+                                      },
                                     ),
-                                  ),
-                                  const Text(
-                                    " is at ",
-                                    style: TextStyle(fontSize: 16),
-                                  ),
-                                  const Icon(
-                                    Icons.location_on,
-                                    size: 16,
-                                    color: Colors.red,
-                                  ),
-                                  Flexible(
-                                    child: Text(
-                                      location,
-                                      style: const TextStyle(fontSize: 16),
-                                      overflow: TextOverflow.ellipsis,
+                                    const SizedBox(width: 4),
+                                    Expanded(
+                                      child: Column(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  SizedBox(
+                                                    width: 4,
+                                                  ),
+                                                  Text(
+                                                    name,
+                                                    style: const TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ],
+                                              ),
+                                              SizedBox(
+                                                width: 4,
+                                              ),
+                                              TextButton(
+                                                onPressed: () {},
+                                                style: TextButton.styleFrom(
+                                                    padding: EdgeInsets.zero,
+                                                    minimumSize:
+                                                        const Size(50, 30),
+                                                    tapTargetSize:
+                                                        MaterialTapTargetSize
+                                                            .shrinkWrap),
+                                                child: const Text(
+                                                  "Follow",
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    color: Colors.blueAccent,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            child: Row(
+                                              children: [
+                                                const Icon(
+                                                  Icons.location_on,
+                                                  size: 14,
+                                                  color: Colors.red,
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  location,
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    color: Colors.black87,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                             if (imageUrl.isNotEmpty)
