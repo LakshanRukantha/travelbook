@@ -15,6 +15,7 @@ class _HomeState extends State<Home> {
   List<Map<String, dynamic>> posts = [];
   String userEmail = "";
   Map<String, dynamic>? user;
+  Set<String> localFollowing = {};
 
   Future<Map<String, dynamic>?> getCurrentUser() async {
     final currentUser = FirebaseAuth.instance.currentUser;
@@ -36,6 +37,7 @@ class _HomeState extends State<Home> {
       setState(() {
         user = userData;
         userEmail = FirebaseAuth.instance.currentUser!.email ?? '';
+        localFollowing = Set<String>.from(userData['following'] ?? []);
       });
     } else {
       context.push("/login");
@@ -102,6 +104,64 @@ class _HomeState extends State<Home> {
       });
       print("Failed to update Firestore like: $error");
     });
+  }
+
+  Future<void> toggleFollowByEmails(
+    currentUserEmail,
+    postedByEmail,
+  ) async {
+    final firestore = FirebaseFirestore.instance;
+
+    final yourUserQuery = await firestore
+        .collection('users')
+        .where('email', isEqualTo: currentUserEmail)
+        .limit(1)
+        .get();
+
+    final postedByUserQuery = await firestore
+        .collection('users')
+        .where('email', isEqualTo: postedByEmail)
+        .limit(1)
+        .get();
+
+    if (yourUserQuery.docs.isEmpty || postedByUserQuery.docs.isEmpty) {
+      print('One or both users not found');
+      return;
+    }
+
+    final yourUserDoc = yourUserQuery.docs.first;
+    final postedByUserDoc = postedByUserQuery.docs.first;
+
+    final yourUserRef = yourUserDoc.reference;
+    final postedByUserRef = postedByUserDoc.reference;
+
+    final yourFollowing =
+        List<String>.from(yourUserDoc.data()['following'] ?? []);
+    final postedByFollowers =
+        List<String>.from(postedByUserDoc.data()['followers'] ?? []);
+
+    final isFollowing = yourFollowing.contains(postedByEmail);
+
+    if (isFollowing) {
+      localFollowing.remove(postedByEmail);
+      yourFollowing.remove(postedByEmail);
+      postedByFollowers.remove(currentUserEmail);
+    } else {
+      localFollowing.add(postedByEmail);
+      yourFollowing.add(postedByEmail);
+      postedByFollowers.add(currentUserEmail);
+    }
+
+    await yourUserRef.update({'following': yourFollowing});
+    await postedByUserRef.update({'followers': postedByFollowers});
+
+    // ✅ Re-fetch and update user data locally
+    final updatedUserData = await getCurrentUser();
+    if (mounted && updatedUserData != null) {
+      setState(() {
+        user = updatedUserData;
+      });
+    }
   }
 
   String _capitalizeEachWord(String input) {
@@ -250,6 +310,10 @@ class _HomeState extends State<Home> {
                       final likes = post["likes"]?.toString() ?? "0";
                       final isLiked = likedUsers.contains(userEmail);
                       final postedBy = post["posted_by"] ?? "Unknown";
+                      final isFollowing = localFollowing.contains(postedBy);
+                      final isMe = postedBy == userEmail;
+
+                      print("I'm Following: ${user?['following']}");
 
                       return Card(
                         margin: const EdgeInsets.all(16),
@@ -321,21 +385,32 @@ class _HomeState extends State<Home> {
                                                 width: 4,
                                               ),
                                               TextButton(
-                                                onPressed: () {},
+                                                onPressed: () async {
+                                                  await toggleFollowByEmails(
+                                                    userEmail,
+                                                    postedBy,
+                                                  );
+                                                },
                                                 style: TextButton.styleFrom(
-                                                    padding: EdgeInsets.zero,
-                                                    minimumSize:
-                                                        const Size(50, 30),
-                                                    tapTargetSize:
-                                                        MaterialTapTargetSize
-                                                            .shrinkWrap),
-                                                child: const Text(
-                                                  "Follow",
-                                                  style: TextStyle(
-                                                    fontSize: 16,
-                                                    color: Colors.blueAccent,
-                                                  ),
+                                                  padding: EdgeInsets.zero,
+                                                  minimumSize:
+                                                      const Size(50, 30),
+                                                  tapTargetSize:
+                                                      MaterialTapTargetSize
+                                                          .shrinkWrap,
                                                 ),
+                                                child: !isMe
+                                                    ? Text(
+                                                        isFollowing
+                                                            ? "Unfollow"
+                                                            : "Follow",
+                                                        style: const TextStyle(
+                                                          fontSize: 16,
+                                                          color:
+                                                              Colors.blueAccent,
+                                                        ),
+                                                      )
+                                                    : const SizedBox.shrink(),
                                               ),
                                             ],
                                           ),
