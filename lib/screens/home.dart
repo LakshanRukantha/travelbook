@@ -37,10 +37,8 @@ class _HomeState extends State<Home> {
         user = userData;
         userEmail = FirebaseAuth.instance.currentUser!.email ?? '';
       });
-      print("User name: ${userData['name']}");
-      print("User image: ${userData['userImage']}");
     } else {
-      print("No user data found.");
+      context.push("/login");
     }
   }
 
@@ -48,7 +46,6 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     fetchUserData();
-    print("user: $user");
     fetchPosts();
   }
 
@@ -68,29 +65,43 @@ class _HomeState extends State<Home> {
     }
   }
 
-  Future<void> toggleLike(String postId, List<dynamic> likedUsers) async {
+  void toggleLike(String postId) {
+    final index = posts.indexWhere((post) => post['post_id'] == postId);
+    if (index == -1) return;
+
+    final isLiked = (posts[index]['liked_users'] as List).contains(userEmail);
+
+    // Real-time update
+    setState(() {
+      if (isLiked) {
+        (posts[index]['liked_users'] as List).remove(userEmail);
+        posts[index]['likes'] = (posts[index]['likes'] ?? 1) - 1;
+      } else {
+        (posts[index]['liked_users'] as List).add(userEmail);
+        posts[index]['likes'] = (posts[index]['likes'] ?? 0) + 1;
+      }
+    });
+
+    // Background Firestore update
     final postRef = FirebaseFirestore.instance.collection('posts').doc(postId);
-    final isLiked = likedUsers.contains(userEmail);
-
-    try {
-      await FirebaseFirestore.instance.runTransaction((transaction) async {
-        final snapshot = await transaction.get(postRef);
-        final currentLikes = snapshot['likes'] ?? 0;
-
-        final newLikes = isLiked ? currentLikes - 1 : currentLikes + 1;
-
-        transaction.update(postRef, {
-          'liked_users': isLiked
-              ? FieldValue.arrayRemove([userEmail])
-              : FieldValue.arrayUnion([userEmail]),
-          'likes': newLikes < 0 ? 0 : newLikes,
-        });
+    postRef.update({
+      'liked_users': isLiked
+          ? FieldValue.arrayRemove([userEmail])
+          : FieldValue.arrayUnion([userEmail]),
+      'likes': FieldValue.increment(isLiked ? -1 : 1),
+    }).catchError((error) {
+      // Revert if failed
+      setState(() {
+        if (!isLiked) {
+          (posts[index]['liked_users'] as List).remove(userEmail);
+          posts[index]['likes'] = (posts[index]['likes'] ?? 1) - 1;
+        } else {
+          (posts[index]['liked_users'] as List).add(userEmail);
+          posts[index]['likes'] = (posts[index]['likes'] ?? 0) + 1;
+        }
       });
-
-      await fetchPosts(); // Refresh posts after update
-    } catch (e) {
-      print("Failed to toggle like: $e");
-    }
+      print("Failed to update Firestore like: $error");
+    });
   }
 
   String _capitalizeEachWord(String input) {
@@ -256,23 +267,6 @@ class _HomeState extends State<Home> {
                                     FutureBuilder<String?>(
                                       future: getUserProfileImage(postedBy),
                                       builder: (context, snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(25),
-                                            child: Container(
-                                              width: 50,
-                                              height: 50,
-                                              color: Colors.grey[300],
-                                              child: const Center(
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                          color: Colors.blue,
-                                                          strokeWidth: 2)),
-                                            ),
-                                          );
-                                        }
                                         if (snapshot.hasData &&
                                             snapshot.data != null &&
                                             snapshot.data!.isNotEmpty) {
@@ -408,8 +402,8 @@ class _HomeState extends State<Home> {
                                                     : Icons.favorite_border,
                                               ),
                                               color: Colors.white,
-                                              onPressed: () => toggleLike(
-                                                  postId, likedUsers),
+                                              onPressed: () =>
+                                                  toggleLike(postId),
                                             ),
                                           ],
                                         ),
