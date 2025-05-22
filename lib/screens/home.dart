@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../services/authentication.dart';
 
 class Home extends StatefulWidget {
@@ -132,18 +133,44 @@ class _HomeState extends State<Home> {
               await AuthServices().signOutUser(context);
             },
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: user?['userImage'] != null && user!['userImage'].isNotEmpty
-                ? CircleAvatar(
-                    radius: 20,
-                    backgroundImage: NetworkImage(user!['userImage']),
-                  )
-                : const CircleAvatar(
-                    radius: 20,
-                    child: Icon(Icons.person, size: 24),
-                  ),
-          ),
+          PopupMenuButton<String>(
+            icon: Icon(Icons.more_vert, color: Colors.white), // White icon
+            onSelected: (value) async {
+              print("Selected: $value");
+              switch (value) {
+                case "weather_today":
+                  context.push('/weather');
+                  break;
+                case "sign_out":
+                  await AuthServices().signOutUser(context);
+                  break;
+                default:
+                  break;
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem<String>(
+                value: "weather_today",
+                child: Row(
+                  children: [
+                    Icon(Icons.wb_sunny, color: Colors.black),
+                    SizedBox(width: 8),
+                    Text("Today's Weather"),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: "sign_out",
+                child: Row(
+                  children: [
+                    Icon(Icons.logout, color: Colors.black),
+                    SizedBox(width: 8),
+                    Text("Sign Out"),
+                  ],
+                ),
+              ),
+            ],
+          )
         ],
         backgroundColor: Colors.blue,
       ),
