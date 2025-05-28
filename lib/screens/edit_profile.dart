@@ -129,12 +129,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Edit Profile"),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
+        title: Text(
+          "Edit Profile",
+          style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.grey[300],
+        backgroundColor: Colors.blue,
+        iconTheme: IconThemeData(color: Colors.white),
         elevation: 0,
       ),
       body: SafeArea(
@@ -203,7 +203,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     child: ElevatedButton(
                       onPressed: () => context.pop(),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
+                        backgroundColor: Colors.black45,
                         padding: EdgeInsets.symmetric(vertical: 12),
                       ),
                       child: Text(
@@ -218,13 +218,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                   SizedBox(width: 10),
                   Expanded(
-                    child: ElevatedButton(
+                    child: ElevatedButton.icon(
                       onPressed: saveProfileChanges,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
+                        backgroundColor: Colors.blue,
                         padding: EdgeInsets.symmetric(vertical: 12),
                       ),
-                      child: Text(
+                      icon: Icon(Icons.save, color: Colors.white, size: 22),
+                      label: Text(
                         "Save",
                         style: TextStyle(
                           color: Colors.white,
