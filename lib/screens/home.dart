@@ -16,6 +16,8 @@ class _HomeState extends State<Home> {
   String userEmail = "";
   Map<String, dynamic>? user;
   Set<String> localFollowing = {};
+  Map<String, String?> profileImageCache = {};
+  Map<String, String> fullNameCache = {};
 
   Future<Map<String, dynamic>?> getCurrentUser() async {
     final currentUser = FirebaseAuth.instance.currentUser;
@@ -189,6 +191,45 @@ class _HomeState extends State<Home> {
     return null;
   }
 
+  Future<String> getUserFullName(String email) async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+
+      if (snapshot.docs.isNotEmpty) {
+        final data = snapshot.docs.first.data();
+        final name = data['name'];
+        return name is String && name.trim().isNotEmpty ? name : "User";
+      } else {
+        return "User";
+      }
+    } catch (e) {
+      print("Something went wrong while fetching the user name: $e");
+      return "User";
+    }
+  }
+
+  Future<String?> getCachedUserProfileImage(String email) async {
+    if (profileImageCache.containsKey(email)) {
+      return profileImageCache[email];
+    }
+    final image = await getUserProfileImage(email);
+    profileImageCache[email] = image;
+    return image;
+  }
+
+  Future<String> getCachedUserFullName(String email) async {
+    if (fullNameCache.containsKey(email)) {
+      return fullNameCache[email]!;
+    }
+    final name = await getUserFullName(email);
+    fullNameCache[email] = name;
+    return name;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -303,7 +344,6 @@ class _HomeState extends State<Home> {
                       final post = posts[index];
                       final postId = post["post_id"] ?? "Unknown ID";
                       final likedUsers = post["liked_users"] ?? [];
-                      final name = post["name"] ?? "Unknown";
                       final location = post["location"] ?? "Unknown location";
                       final imageUrl = post["image"] ?? "";
                       final caption = post["caption"] ?? "";
@@ -329,32 +369,17 @@ class _HomeState extends State<Home> {
                                   children: [
                                     // Profile Image
                                     FutureBuilder<String?>(
-                                      future: getUserProfileImage(postedBy),
+                                      future:
+                                          getCachedUserProfileImage(postedBy),
                                       builder: (context, snapshot) {
-                                        if (snapshot.hasData &&
-                                            snapshot.data != null &&
-                                            snapshot.data!.isNotEmpty) {
-                                          return ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(25),
-                                            child: Image.network(
-                                              snapshot.data!,
-                                              width: 50,
-                                              height: 50,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          );
-                                        }
-                                        return ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(25),
-                                          child: Container(
-                                            width: 50,
-                                            height: 50,
-                                            color: Colors.grey[300],
-                                            child: const Icon(Icons.person,
-                                                size: 30),
-                                          ),
+                                        final imageUrl = snapshot.data;
+                                        return CircleAvatar(
+                                          backgroundImage: imageUrl != null
+                                              ? NetworkImage(imageUrl)
+                                              : null,
+                                          child: imageUrl == null
+                                              ? Icon(Icons.person)
+                                              : null,
                                         );
                                       },
                                     ),
@@ -369,15 +394,26 @@ class _HomeState extends State<Home> {
                                                   SizedBox(
                                                     width: 4,
                                                   ),
-                                                  Text(
-                                                    name,
-                                                    style: const TextStyle(
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
+                                                  FutureBuilder<String?>(
+                                                    future:
+                                                        getCachedUserFullName(
+                                                            postedBy),
+                                                    builder:
+                                                        (context, snapshot) {
+                                                      final displayName =
+                                                          snapshot.data ??
+                                                              "User";
+                                                      return Text(
+                                                        displayName,
+                                                        style: const TextStyle(
+                                                          fontSize: 18,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      );
+                                                    },
                                                   ),
                                                 ],
                                               ),
@@ -410,7 +446,15 @@ class _HomeState extends State<Home> {
                                                               Colors.blueAccent,
                                                         ),
                                                       )
-                                                    : const SizedBox.shrink(),
+                                                    : Text(
+                                                        "(You)",
+                                                        style: const TextStyle(
+                                                          fontSize: 18,
+                                                          color: Colors.black38,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
                                               ),
                                             ],
                                           ),
