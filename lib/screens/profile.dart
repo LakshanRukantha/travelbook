@@ -62,11 +62,13 @@ class _ProfilePageState extends State<ProfilePage> {
         setState(() {
           profileEmail = currentUser.email ?? 'No Email';
           profileUsername = userData?['name'] ?? 'No Name';
-          userImage = userData?['profileImage'] ?? "";
+          userImage = userData?['userImage'] ?? "";
           profileBio = userData?['bio'] ?? '';
           profileLocation = userData?['location'] ?? '';
-          followersCount = (userData?['followers'] as List<dynamic>?)?.length ?? 0;
-          followingCount = (userData?['following'] as List<dynamic>?)?.length ?? 0;
+          followersCount =
+              (userData?['followers'] as List<dynamic>?)?.length ?? 0;
+          followingCount =
+              (userData?['following'] as List<dynamic>?)?.length ?? 0;
         });
       }
     } catch (e) {
@@ -115,7 +117,7 @@ class _ProfilePageState extends State<ProfilePage> {
         await FirebaseFirestore.instance
             .collection('users')
             .doc(currentUser.uid)
-            .update({'profileImage': downloadUrl});
+            .update({'userImage': downloadUrl});
 
         setState(() {
           userImage = downloadUrl;
@@ -126,79 +128,13 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  void _addPost() {
-    TextEditingController postController = TextEditingController();
-    String selectedImage = "assets/images/posts/travel.webp";
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("Add New Post"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: postController,
-                decoration: InputDecoration(labelText: "Enter your post"),
-              ),
-              SizedBox(height: 10),
-              DropdownButton<String>(
-                value: selectedImage,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedImage = newValue!;
-                  });
-                },
-                items: [
-                  "assets/images/posts/travel.webp",
-                  "assets/images/posts/travel1.webp",
-                  "assets/images/posts/travel2.webp"
-                ].map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value.split("/").last),
-                  );
-                }).toList(),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text("Cancel"),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                if (postController.text.isNotEmpty) {
-                  final currentUser = FirebaseAuth.instance.currentUser;
-                  if (currentUser != null) {
-                    await FirebaseFirestore.instance.collection('posts').add({
-                      'text': postController.text,
-                      'likes': 0,
-                      'time': DateTime.now().toIso8601String(),
-                      'image': selectedImage,
-                      'posted_by': currentUser.email,
-                    });
-                    await fetchUserPosts();
-                  }
-                  Navigator.pop(context);
-                }
-              },
-              child: Text("Post"),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   Widget profileStat(String count, String label, [VoidCallback? onTap]) {
     return GestureDetector(
       onTap: onTap,
       child: Column(
         children: [
-          Text(count, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text(count,
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           Text(label, style: TextStyle(color: Colors.grey)),
         ],
       ),
@@ -225,19 +161,15 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.grey[300],
+        backgroundColor: Colors.blue,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            context.go('/home');
-          },
-        ),
         title: Align(
           alignment: Alignment.centerLeft,
-          child: Text("Profile", style: TextStyle(color: Colors.black)),
+          child: Text(
+            "Profile",
+            style: TextStyle(color: Colors.white),
+          ),
         ),
-        centerTitle: false,
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -260,7 +192,8 @@ class _ProfilePageState extends State<ProfilePage> {
               Text(profileLocation, style: TextStyle(color: Colors.grey[600])),
             if (profileBio.isNotEmpty)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
                 child: Text(
                   profileBio,
                   textAlign: TextAlign.center,
@@ -284,7 +217,9 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             SizedBox(height: 20),
             ElevatedButton.icon(
-              onPressed: _addPost,
+              onPressed: () async {
+                context.push("/new_post");
+              },
               icon: Icon(Icons.add),
               label: Text("Add Post"),
             ),
