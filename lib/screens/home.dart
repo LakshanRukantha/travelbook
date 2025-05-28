@@ -234,9 +234,20 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "Travel Book",
-          style: TextStyle(color: Colors.white),
+        title: RichText(
+          text: TextSpan(
+            style: TextStyle(color: Colors.white, fontSize: 24),
+            children: [
+              TextSpan(
+                text: 'Travel',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              TextSpan(
+                text: 'Book',
+                style: TextStyle(fontWeight: FontWeight.normal),
+              ),
+            ],
+          ),
         ),
         actions: [
           IconButton(
