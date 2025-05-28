@@ -2,7 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:travelbook/screens/edit_profile.dart';
 import 'package:travelbook/screens/home.dart';
 import 'package:travelbook/screens/profile.dart';
-import 'package:travelbook/screens/test_screen.dart';
+import 'package:travelbook/screens/map.dart';
 
 import 'layouts/main_layout.dart';
 
@@ -19,7 +19,7 @@ final GoRouter router = GoRouter(
         GoRoute(
             path: '/test',
             name: "/test",
-            builder: (context, state) => const TestScreen()),
+            builder: (context, state) => const MapScreen()),
         GoRoute(
           path: '/profile',
           name: "/profile",

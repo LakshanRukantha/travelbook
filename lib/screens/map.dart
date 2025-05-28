@@ -1,4 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:http/http.dart' as http;
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -8,49 +12,108 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
+  GoogleMapController? mapController;
+  TextEditingController fromController = TextEditingController();
+  TextEditingController toController = TextEditingController();
+  Set<Polyline> _polylines = {};
+  Set<Marker> _markers = {};
+  LatLng _initialPosition = const LatLng(37.77483, -122.41942); // Default to San Francisco
+
+  Future<void> _getRoute() async {
+    String origin = fromController.text;
+    String destination = toController.text;
+    String apiKey = "API_KEY";
+
+    String url =
+        "https://maps.googleapis.com/maps/api/directions/json?origin=$origin&destination=$destination&key=$apiKey";
+
+    final response = await http.get(Uri.parse(url));
+    final data = json.decode(response.body);
+
+    if (data["status"] == "OK") {
+      final points = PolylinePoints().decodePolyline(
+        data["routes"][0]["overview_polyline"]["points"],
+      );
+
+      List<LatLng> polylineCoordinates = points
+          .map((point) => LatLng(point.latitude, point.longitude))
+          .toList();
+
+      setState(() {
+        _polylines = {
+          Polyline(
+            polylineId: const PolylineId("route"),
+            points: polylineCoordinates,
+            color: Colors.blue,
+            width: 5,
+          )
+        };
+
+        final startLocation = data["routes"][0]["legs"][0]["start_location"];
+        final endLocation = data["routes"][0]["legs"][0]["end_location"];
+
+        _markers = {
+          Marker(
+            markerId: const MarkerId("start"),
+            position: LatLng(startLocation["lat"], startLocation["lng"]),
+            infoWindow: const InfoWindow(title: "From"),
+          ),
+          Marker(
+            markerId: const MarkerId("end"),
+            position: LatLng(endLocation["lat"], endLocation["lng"]),
+            infoWindow: const InfoWindow(title: "To"),
+          ),
+        };
+
+        mapController?.animateCamera(
+          CameraUpdate.newLatLngBounds(
+            LatLngBounds(
+              southwest: LatLng(
+                  startLocation["lat"], startLocation["lng"]),
+              northeast: LatLng(endLocation["lat"], endLocation["lng"]),
+            ),
+            100,
+          ),
+        );
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Route not found!")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Map"),
-
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Stack(
         children: [
-        
-          Positioned.fill(
-            child: Container(
-              color: Colors.grey[300], 
-              child: const Center(
-                child: Text(
-                  "Map View Placeholder",
-                  style: TextStyle(fontSize: 18, color: Colors.black54),
-                ),
-              ),
-            ),
+          GoogleMap(
+            initialCameraPosition: CameraPosition(target: _initialPosition, zoom: 12),
+            onMapCreated: (controller) => mapController = controller,
+            markers: _markers,
+            polylines: _polylines,
+            myLocationEnabled: true,
           ),
-          
-    
           Positioned(
-            bottom: 50, 
+            bottom: 50,
             left: 20,
             right: 20,
             child: Column(
               children: [
-                _buildTextField("From:"),
+                _buildTextField("From:", fromController),
                 const SizedBox(height: 10),
-                _buildTextField("To:"),
+                _buildTextField("To:", toController),
                 const SizedBox(height: 15),
                 ElevatedButton(
-                  onPressed: () {
-                    
-                  },
+                  onPressed: _getRoute,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     padding: const EdgeInsets.symmetric(vertical: 12),
@@ -59,10 +122,7 @@ class _MapScreenState extends State<MapScreen> {
                     ),
                     minimumSize: const Size(double.infinity, 50),
                   ),
-                  child: const Text(
-                    "Search",
-                    style: TextStyle(fontSize: 18, color: Colors.white),
-                  ),
+                  child: const Text("Search", style: TextStyle(fontSize: 18, color: Colors.white)),
                 ),
               ],
             ),
@@ -72,19 +132,17 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  Widget _buildTextField(String hint) {
+  Widget _buildTextField(String hint, TextEditingController controller) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
+        boxShadow: [const BoxShadow(color: Colors.black12, blurRadius: 5)],
       ),
       child: TextField(
-        decoration: InputDecoration(
-          hintText: hint,
-          border: InputBorder.none,
-        ),
+        controller: controller,
+        decoration: InputDecoration(hintText: hint, border: InputBorder.none),
       ),
     );
   }
