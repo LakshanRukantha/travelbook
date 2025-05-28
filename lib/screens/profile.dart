@@ -15,6 +15,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   String profileEmail = "Loading...";
   String profileUsername = "Loading username...";
+  bool isLoadingPosts = true;
   String userImage = "";
   String profileBio = "";
   String profileLocation = "";
@@ -30,8 +31,12 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    fetchUserData();
-    fetchUserPosts();
+    initProfile();
+  }
+
+  Future<void> initProfile() async {
+    await fetchUserData();
+    await fetchUserPosts();
   }
 
   Future<void> fetchUserData() async {
@@ -61,22 +66,33 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> fetchUserPosts() async {
+    setState(() {
+      isLoadingPosts = true;
+    });
     try {
       final currentUser = FirebaseAuth.instance.currentUser;
-      if (currentUser != null) {
+      final userEmail = currentUser?.email;
+
+      if (userEmail != null) {
         final querySnapshot = await FirebaseFirestore.instance
             .collection('posts')
-            .where('posted_by', isEqualTo: currentUser.email)
-            .orderBy('time', descending: true)
+            .where('posted_by', isEqualTo: userEmail)
+            // .orderBy('time', descending: true)
             .get();
 
         setState(() {
           postsCount = querySnapshot.docs.length;
           userPosts = querySnapshot.docs.map((doc) => doc.data()).toList();
         });
+      } else {
+        print("User email is null while fetching posts.");
       }
     } catch (e) {
       print('Error fetching posts: $e');
+    } finally {
+      setState(() {
+        isLoadingPosts = false;
+      });
     }
   }
 
@@ -128,15 +144,54 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget postItem(String text, int likes, String time, String image) {
     return Card(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: ListTile(
-        leading: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: image.startsWith("http")
-              ? Image.network(image, width: 50, height: 50, fit: BoxFit.cover)
-              : Image.asset(image, width: 50, height: 50, fit: BoxFit.cover),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            // Post image
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: image.startsWith("http")
+                  ? Image.network(image,
+                      width: 80, height: 80, fit: BoxFit.cover)
+                  : Image.asset(image,
+                      width: 80, height: 80, fit: BoxFit.cover),
+            ),
+            SizedBox(width: 12),
+
+            // Post details
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    text,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    "$time  •  $likes Likes",
+                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.delete, color: Colors.red),
+                  onPressed: () {
+                    // TODO: Function to delete post
+                  },
+                ),
+              ],
+            ),
+          ],
         ),
-        title: Text(text),
-        subtitle: Text("$time  •  $likes Likes"),
       ),
     );
   }
@@ -157,38 +212,47 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       body: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start, // Left align by default
           children: [
             SizedBox(height: 20),
-            GestureDetector(
-              onTap: _changeProfilePicture,
-              child: CircleAvatar(
-                radius: 50,
-                backgroundImage: userImage.isNotEmpty
-                    ? NetworkImage(userImage)
-                    : AssetImage(defaultImage) as ImageProvider,
+            Center(
+              child: GestureDetector(
+                onTap: _changeProfilePicture,
+                child: CircleAvatar(
+                  radius: 50,
+                  backgroundImage: userImage.isNotEmpty
+                      ? NetworkImage(userImage)
+                      : AssetImage(defaultImage) as ImageProvider,
+                ),
               ),
             ),
             SizedBox(height: 10),
-            Text(profileUsername,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            Text(profileEmail, style: TextStyle(color: Colors.grey)),
+            Center(
+              child: Text(profileUsername,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            ),
+            Center(
+              child: Text(profileEmail, style: TextStyle(color: Colors.grey)),
+            ),
             if (profileLocation.isNotEmpty)
-              Text(profileLocation, style: TextStyle(color: Colors.grey[600])),
+              Center(
+                child: Text(profileLocation,
+                    style: TextStyle(color: Colors.grey[600])),
+              ),
             if (profileBio.isNotEmpty)
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+              Center(
                 child: Text(
                   profileBio,
-                  textAlign: TextAlign.center,
                   style: TextStyle(fontStyle: FontStyle.italic),
                 ),
               ),
-            ElevatedButton(
-              onPressed: () {
-                context.pushNamed("edit_profile");
-              },
-              child: Text("Edit Profile"),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  context.pushNamed("edit_profile");
+                },
+                child: Text("Edit Profile"),
+              ),
             ),
             SizedBox(height: 20),
             Row(
@@ -200,43 +264,67 @@ class _ProfilePageState extends State<ProfilePage> {
               ],
             ),
             SizedBox(height: 20),
-            ElevatedButton.icon(
-              onPressed: () async {
-                context.push("/new_post");
-              },
-              icon: Icon(Icons.add),
-              label: Text("Add Post"),
+            Center(
+              child: ElevatedButton.icon(
+                onPressed: () async {
+                  context.push("/new_post");
+                },
+                icon: Icon(Icons.add),
+                label: Text("Add Post"),
+              ),
             ),
             SizedBox(height: 10),
-            userPosts.isEmpty
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                "My Posts",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+            isLoadingPosts
                 ? Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      "No posts yet.",
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
-                    ),
+                    child: Center(child: CircularProgressIndicator()),
                   )
-                : Column(
-                    children: userPosts.map((post) {
-                      return postItem(
-                        post["text"] ?? '',
-                        post["likes"] ?? 0,
-                        _formatTime(post["time"] ?? ''),
-                        post["image"] ?? '',
-                      );
-                    }).toList(),
-                  ),
+                : userPosts.isEmpty
+                    ? Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            CircularProgressIndicator(color: Colors.blue),
+                            SizedBox(height: 10),
+                            Text(
+                              "No posts yet.",
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.grey),
+                            ),
+                          ],
+                        ),
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: userPosts.map((post) {
+                          return postItem(
+                            post["caption"] ?? '',
+                            post["likes"] ?? 0,
+                            _formatTime(post["time"] ?? ''),
+                            post["image"] ?? '',
+                          );
+                        }).toList(),
+                      ),
           ],
         ),
       ),
     );
   }
 
-  String _formatTime(String isoTime) {
+  String _formatTime(dynamic time) {
     try {
-      final postDate = DateTime.parse(isoTime);
+      final postDate =
+          time is Timestamp ? time.toDate() : DateTime.parse(time.toString());
       final now = DateTime.now();
       final difference = now.difference(postDate);
+
       if (difference.inDays > 0) return "${difference.inDays}d ago";
       if (difference.inHours > 0) return "${difference.inHours}h ago";
       if (difference.inMinutes > 0) return "${difference.inMinutes}m ago";
