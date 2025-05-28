@@ -6,6 +6,7 @@ import 'package:travelbook/screens/chat_bot.dart';
 import 'package:travelbook/screens/edit_profile.dart';
 import 'package:travelbook/screens/home.dart';
 import 'package:travelbook/screens/log_in.dart';
+import 'package:travelbook/screens/notifications.dart';
 import 'package:travelbook/screens/profile.dart';
 import 'package:travelbook/screens/sign_up.dart';
 import 'package:travelbook/screens/test_screen.dart';
@@ -75,6 +76,11 @@ final GoRouter router = GoRouter(
           path: '/edit_profile',
           name: "edit_profile",
           builder: (context, state) => EditProfilePage(),
+        ),
+        GoRoute(
+          path: '/notifications',
+          name: "notifications",
+          builder: (context, state) => NotificationsPage(),
         ),
       ],
     ),
