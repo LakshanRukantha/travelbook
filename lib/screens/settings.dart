@@ -38,7 +38,7 @@ class SettingsPage extends StatelessWidget {
             leading: const Icon(Icons.privacy_tip),
             title: const Text('Privacy Policy'),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: () => context.push('/privacy-policy'),
+            onTap: () => context.push('/privacy_policy'),
           ),
           ListTile(
             leading: const Icon(Icons.info),

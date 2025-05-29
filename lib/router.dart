@@ -9,10 +9,10 @@ import 'package:travelbook/screens/home.dart';
 import 'package:travelbook/screens/log_in.dart';
 import 'package:travelbook/screens/newpost.dart';
 import 'package:travelbook/screens/notifications.dart';
+import 'package:travelbook/screens/privacy_policy.dart';
 import 'package:travelbook/screens/profile.dart';
 import 'package:travelbook/screens/settings.dart';
 import 'package:travelbook/screens/sign_up.dart';
-import 'package:travelbook/screens/test_screen.dart';
 import 'package:travelbook/router_refresh.dart';
 import 'package:travelbook/screens/map.dart';
 import 'package:travelbook/screens/weather.dart';
@@ -107,6 +107,11 @@ final GoRouter router = GoRouter(
           path: '/new_post',
           name: "/new_post",
           builder: (context, state) => const NewPost(),
+        ),
+        GoRoute(
+          path: '/privacy_policy',
+          name: "/privacy_policy",
+          builder: (context, state) => const PrivacyPolicyPage(),
         ),
       ],
     ),
