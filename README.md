@@ -35,6 +35,7 @@ The project uses the following major Flutter packages:
 
 ## 📂 Project Structure
 
+```
 lib/
 ├── main.dart
 ├── screens/
@@ -48,6 +49,7 @@ assets/
 ├── posts/
 └── sign/
 .env
+```
 
 ## 🔧 Getting Started
 
