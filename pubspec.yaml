@@ -39,13 +39,17 @@ dependencies:
   go_router: ^14.8.1
   curved_navigation_bar: ^1.0.6
   firebase_auth: ^5.5.3
+  google_maps_flutter: ^2.12.2
+  location: ^8.0.0
+  flutter_polyline_points: ^2.1.0
+  http: ^1.4.0
   dash_chat_2: ^0.0.21
   flutter_gemini: ^3.0.0
   flutter_dotenv: ^5.2.1
-  http: ^1.4.0
+  image_picker: ^1.1.2
+  firebase_storage: ^12.4.6
   geolocator: ^13.0.4
   geocoding: ^3.0.0
-  
 
 dev_dependencies:
   flutter_test:

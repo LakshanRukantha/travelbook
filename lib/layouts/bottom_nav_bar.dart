@@ -10,11 +10,11 @@ class BottomNavBar extends StatelessWidget {
     // Get the current location from GoRouter
     final String currentRoute = GoRouterState.of(context).uri.toString();
 
-    // Define routes where the bottom nav should be hidden
-    final hideNavRoutes = ['/login', '/signup'];
+    // Routes where bottom nav bar should be shown
+    final showNavRoutes = ['/', '/map', '/chat', '/settings', '/profile'];
 
-    // Hide bottom nav bar on specific routes
-    if (hideNavRoutes.contains(currentRoute)) {
+    // If current route is not in showNavRoutes, hide bottom nav bar
+    if (!showNavRoutes.contains(currentRoute)) {
       return const SizedBox.shrink();
     }
 
@@ -23,7 +23,7 @@ class BottomNavBar extends StatelessWidget {
       switch (currentRoute) {
         case '/':
           return 0;
-        case '/test':
+        case '/map':
           return 1;
         case '/chat':
           return 2;
@@ -32,7 +32,7 @@ class BottomNavBar extends StatelessWidget {
         case '/profile':
           return 4;
         default:
-          return 0; // Hide bottom nav if route not found
+          return 0; // Default to home index just in case
       }
     }
 
@@ -55,7 +55,7 @@ class BottomNavBar extends StatelessWidget {
             context.go('/');
             break;
           case 1:
-            context.go('/test');
+            context.go('/map');
             break;
           case 2:
             context.go('/chat');
