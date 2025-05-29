@@ -13,31 +13,13 @@ class WeatherCard extends StatelessWidget {
     final temp = main['temp'].toDouble();
     final icon = weather['icon'];
 
-    print("$icon hello");
-    print("$weather");
-
     return SingleChildScrollView(
       child: Container(
-        padding: const EdgeInsets.all(50),
+        padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Colors.blueAccent.withOpacity(0.8),
-              Colors.lightBlueAccent.withOpacity(0.8),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: Colors.white),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.blue,
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
-          ],
-          color: Colors.white,
+          color: const Color.fromARGB(71, 33, 149, 243),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.blue),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -47,7 +29,7 @@ class WeatherCard extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 26,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
+                color: Colors.black87,
               ),
             ),
             const SizedBox(height: 20),
@@ -58,16 +40,15 @@ class WeatherCard extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 42,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: Colors.black,
               ),
             ),
             Text(
               weather['description'].toString().toUpperCase(),
-
               style: const TextStyle(
-                color: Colors.white70,
-                fontSize: 25,
-                fontWeight: FontWeight.w600,
+                color: Colors.blueGrey,
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
               ),
             ),
             const SizedBox(height: 20),
@@ -90,16 +71,16 @@ class WeatherCard extends StatelessWidget {
         Text(
           title,
           style: const TextStyle(
-            color: Colors.white70,
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
+            color: Colors.black54,
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           value,
           style: const TextStyle(
-            color: Colors.white,
+            color: Colors.black,
             fontWeight: FontWeight.w600,
             fontSize: 20,
           ),
@@ -108,9 +89,9 @@ class WeatherCard extends StatelessWidget {
     );
   }
 
-  /// This widget handles special icons (like 01d) and fallbacks
   Widget buildWeatherIcon(String icon) {
-    const iconsToIgnore = ['01d', '01n']; // You can add more here
+    // const iconsToIgnore = ['01d', '01n'];
+    const iconsToIgnore = [''];
 
     if (icon.isEmpty || iconsToIgnore.contains(icon)) {
       return Image.asset(

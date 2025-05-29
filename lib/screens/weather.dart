@@ -71,18 +71,20 @@ class _WeatherPageState extends State<WeatherPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Travel Weather"),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        foregroundColor: Colors.black87,
+        title: const Text(
+          "Travel Weather",
+          style: TextStyle(color: Colors.white),
+        ),
+        iconTheme: IconThemeData(color: Colors.white),
+        backgroundColor: Colors.blue,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 30),
         child: Column(
           children: [
             Material(
-              elevation: 2,
-              shadowColor: Colors.grey.withOpacity(0.3),
+              elevation: 1,
+              borderOnForeground: true,
               borderRadius: BorderRadius.circular(16),
               child: TextField(
                 controller: _cityController,
@@ -115,8 +117,10 @@ class _WeatherPageState extends State<WeatherPage> {
                           )
                         : weatherData != null
                             ? WeatherCard(data: weatherData!)
-                            : const Text("No data",
-                                style: TextStyle(fontSize: 16)),
+                            : const Text(
+                                "No data",
+                                style: TextStyle(fontSize: 16),
+                              ),
               ),
             ),
           ],

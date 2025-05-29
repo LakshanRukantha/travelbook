@@ -12,6 +12,7 @@ import 'package:travelbook/screens/sign_up.dart';
 import 'package:travelbook/screens/test_screen.dart';
 import 'package:travelbook/router_refresh.dart';
 import 'package:travelbook/screens/map.dart';
+import 'package:travelbook/screens/weather.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: '/',
@@ -83,6 +84,11 @@ final GoRouter router = GoRouter(
           path: '/notifications',
           name: "notifications",
           builder: (context, state) => NotificationsPage(),
+        ),
+        GoRoute(
+          path: '/weather',
+          name: "weather",
+          builder: (context, state) => WeatherPage(),
         ),
       ],
     ),
