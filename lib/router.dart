@@ -7,6 +7,7 @@ import 'package:travelbook/screens/chat_bot.dart';
 import 'package:travelbook/screens/edit_profile.dart';
 import 'package:travelbook/screens/home.dart';
 import 'package:travelbook/screens/log_in.dart';
+import 'package:travelbook/screens/newpost.dart';
 import 'package:travelbook/screens/notifications.dart';
 import 'package:travelbook/screens/profile.dart';
 import 'package:travelbook/screens/settings.dart';
@@ -101,6 +102,11 @@ final GoRouter router = GoRouter(
           path: '/about',
           name: "/about",
           builder: (context, state) => const AboutUs(),
+        ),
+        GoRoute(
+          path: '/new_post',
+          name: "/new_post",
+          builder: (context, state) => const NewPost(),
         ),
       ],
     ),

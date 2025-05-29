@@ -24,7 +24,7 @@ class _ProfilePageState extends State<ProfilePage> {
   int followersCount = 0;
   int followingCount = 0;
 
-  final defaultImage = "assets/images/developers/user.webp";
+  final defaultImage = "assets/images/developers/user_default.png";
 
   List<Map<String, dynamic>> userPosts = [];
 
