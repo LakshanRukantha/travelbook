@@ -6,10 +6,12 @@ import 'package:travelbook/screens/chat_bot.dart';
 import 'package:travelbook/screens/edit_profile.dart';
 import 'package:travelbook/screens/home.dart';
 import 'package:travelbook/screens/log_in.dart';
+import 'package:travelbook/screens/notifications.dart';
 import 'package:travelbook/screens/profile.dart';
 import 'package:travelbook/screens/sign_up.dart';
 import 'package:travelbook/screens/test_screen.dart';
 import 'package:travelbook/router_refresh.dart';
+import 'package:travelbook/screens/map.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: '/',
@@ -48,9 +50,9 @@ final GoRouter router = GoRouter(
           builder: (context, state) => const Home(),
         ),
         GoRoute(
-          path: '/test',
-          name: '/test',
-          builder: (context, state) => const TestScreen(),
+          path: '/map',
+          name: '/map',
+          builder: (context, state) => const MapScreen(),
         ),
         GoRoute(
           path: '/login',
@@ -63,9 +65,10 @@ final GoRouter router = GoRouter(
           builder: (context, state) => const SignUpscreen(),
         ),
         GoRoute(
-            path: '/chat',
-            name: "/chat",
-            builder: (context, state) => const ChatBot()),
+          path: '/chat',
+          name: "/chat",
+          builder: (context, state) => const ChatBot(),
+        ),
         GoRoute(
           path: '/profile',
           name: "/profile",
@@ -75,6 +78,11 @@ final GoRouter router = GoRouter(
           path: '/edit_profile',
           name: "edit_profile",
           builder: (context, state) => EditProfilePage(),
+        ),
+        GoRoute(
+          path: '/notifications',
+          name: "notifications",
+          builder: (context, state) => NotificationsPage(),
         ),
       ],
     ),

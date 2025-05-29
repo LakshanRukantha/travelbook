@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class AuthServices {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -58,7 +60,8 @@ class AuthServices {
     return res;
   }
 
-  Future<void> signOutUser() async {
+  Future<void> signOutUser(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
+    GoRouter.of(context).go('/login');
   }
 }
