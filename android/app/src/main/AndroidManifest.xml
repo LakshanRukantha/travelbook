@@ -3,6 +3,7 @@
 
     <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
@@ -11,12 +12,11 @@
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
-        <!-- Google Maps Service -->
+        <!-- Google Maps API Key -->
         <meta-data
-        android:name="com.google.android.geo.API_KEY"
-        android:value="${GOOGLE_MAPS_API_KEY}" />
+            android:name="com.google.android.geo.API_KEY"
+            android:value="YOUR_API_KEY" />
 
-        <!-- Main activity configuration -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -27,7 +27,7 @@
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
 
-            <!-- Required by Flutter -->
+            <!-- Flutter embedding version -->
             <meta-data
                 android:name="flutterEmbedding"
                 android:value="2" />
@@ -41,7 +41,9 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
+
     </application>
 
     <!-- Required for text processing plugins -->
@@ -51,4 +53,5 @@
             <data android:mimeType="text/plain" />
         </intent>
     </queries>
+
 </manifest>

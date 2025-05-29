@@ -43,6 +43,11 @@ dependencies:
   location: ^8.0.0
   flutter_polyline_points: ^2.1.0
   http: ^1.4.0
+  dash_chat_2: ^0.0.21
+  flutter_gemini: ^3.0.0
+  flutter_dotenv: ^5.2.1
+  image_picker: ^1.1.2
+  firebase_storage: ^12.4.6
 
 dev_dependencies:
   flutter_test:
@@ -67,10 +72,12 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - .env
     - assets/images/posts/travel.webp
     - assets/images/posts/travel1.webp
     - assets/images/posts/travel2.webp
     - assets/images/logo.webp
+    - assets/images/travel_buddy.png
     - assets/images/developers/user.webp
     - assets/images/sign/
   #   - images/a_dot_ham.jpeg
