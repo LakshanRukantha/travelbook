@@ -17,12 +17,12 @@ class _MapScreenState extends State<MapScreen> {
   TextEditingController toController = TextEditingController();
   Set<Polyline> _polylines = {};
   Set<Marker> _markers = {};
-  LatLng _initialPosition = const LatLng(37.77483, -122.41942); // Default to San Francisco
+  final LatLng _initialPosition = const LatLng(7.8731, 80.7718);
 
   Future<void> _getRoute() async {
     String origin = fromController.text;
     String destination = toController.text;
-    String apiKey = "API_KEY";
+    String apiKey = dotenv.env['GOOGLE_MAPS_API_KEY']!;
 
     String url =
         "https://maps.googleapis.com/maps/api/directions/json?origin=$origin&destination=$destination&key=$apiKey";
@@ -68,8 +68,7 @@ class _MapScreenState extends State<MapScreen> {
         mapController?.animateCamera(
           CameraUpdate.newLatLngBounds(
             LatLngBounds(
-              southwest: LatLng(
-                  startLocation["lat"], startLocation["lng"]),
+              southwest: LatLng(startLocation["lat"], startLocation["lng"]),
               northeast: LatLng(endLocation["lat"], endLocation["lng"]),
             ),
             100,
@@ -96,7 +95,8 @@ class _MapScreenState extends State<MapScreen> {
       body: Stack(
         children: [
           GoogleMap(
-            initialCameraPosition: CameraPosition(target: _initialPosition, zoom: 12),
+            initialCameraPosition:
+                CameraPosition(target: _initialPosition, zoom: 12),
             onMapCreated: (controller) => mapController = controller,
             markers: _markers,
             polylines: _polylines,
@@ -122,7 +122,8 @@ class _MapScreenState extends State<MapScreen> {
                     ),
                     minimumSize: const Size(double.infinity, 50),
                   ),
-                  child: const Text("Search", style: TextStyle(fontSize: 18, color: Colors.white)),
+                  child: const Text("Search",
+                      style: TextStyle(fontSize: 18, color: Colors.white)),
                 ),
               ],
             ),
