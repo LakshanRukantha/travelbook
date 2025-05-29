@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:travelbook/services/authentication.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -57,6 +58,40 @@ class SettingsPage extends StatelessWidget {
             title: const Text('About Us'),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () => context.push('/about'),
+          ),
+          const SizedBox(height: 24),
+          const Text(
+            'Danger Zone',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          ListTile(
+            leading: const Icon(Icons.output),
+            title: const Text('Sign Out'),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () async {
+              final shouldSignOut = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Confirm Sign Out'),
+                  content: const Text('Are you sure you want to sign out?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => context.pop(false),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () => context.pop(true),
+                      child: const Text('Sign Out'),
+                    ),
+                  ],
+                ),
+              );
+
+              if (shouldSignOut == true) {
+                await AuthServices().signOutUser(context);
+              }
+            },
           ),
         ],
       ),

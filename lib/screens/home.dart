@@ -268,7 +268,27 @@ class _HomeState extends State<Home> {
                   context.push('/emergency_contact');
                   break;
                 case "sign_out":
-                  await AuthServices().signOutUser(context);
+                  final shouldSignOut = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Confirm Sign Out'),
+                      content: const Text('Are you sure you want to sign out?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => context.pop(false),
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () => context.pop(true),
+                          child: const Text('Sign Out'),
+                        ),
+                      ],
+                    ),
+                  );
+
+                  if (shouldSignOut == true) {
+                    await AuthServices().signOutUser(context);
+                  }
                   break;
                 default:
                   break;

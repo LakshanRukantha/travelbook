@@ -100,7 +100,7 @@ class _NewPostState extends State<NewPost> {
       });
 
       _showSnackbar("Post uploaded successfully!", color: Colors.green);
-      Navigator.pop(context);
+      context.pop();
     } catch (e) {
       _showSnackbar("Failed to upload post. Please try again.");
     } finally {
