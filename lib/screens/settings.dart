@@ -30,6 +30,18 @@ class SettingsPage extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           const Text(
+            'Emergency Contact',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          ListTile(
+            leading: const Icon(Icons.emergency),
+            title: const Text('Hotlines'),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () => context.push('/emergency_contact'),
+          ),
+          const SizedBox(height: 24),
+          const Text(
             'Legal & Info',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),

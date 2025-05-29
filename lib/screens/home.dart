@@ -264,6 +264,9 @@ class _HomeState extends State<Home> {
                 case "weather_today":
                   context.push('/weather');
                   break;
+                case "emergency_contact":
+                  context.push('/emergency_contact');
+                  break;
                 case "sign_out":
                   await AuthServices().signOutUser(context);
                   break;
@@ -279,6 +282,16 @@ class _HomeState extends State<Home> {
                     Icon(Icons.wb_sunny, color: Colors.black),
                     SizedBox(width: 8),
                     Text("Today's Weather"),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: "emergency_contact",
+                child: Row(
+                  children: [
+                    Icon(Icons.emergency, color: Colors.black),
+                    SizedBox(width: 8),
+                    Text("Emergency Hotlines"),
                   ],
                 ),
               ),

@@ -26,13 +26,11 @@ class AboutUs extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                   ),
-                  child: ClipOval(
-                    child: Image.asset(
-                      "assets/images/logo.webp",
-                      height: 80,
-                      width: 80,
-                      fit: BoxFit.cover,
-                    ),
+                  child: Image.asset(
+                    "assets/images/logo.png",
+                    height: 80,
+                    width: 80,
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),

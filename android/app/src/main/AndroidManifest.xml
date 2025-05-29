@@ -48,11 +48,15 @@
 
     </application>
 
-    <!-- Required for text processing plugins -->
+    <!-- Required for text processing, dialer plugins -->
     <queries>
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT" />
             <data android:mimeType="text/plain" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.DIAL" />
+            <data android:scheme="tel" />
         </intent>
     </queries>
 

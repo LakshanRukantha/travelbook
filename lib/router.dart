@@ -5,6 +5,7 @@ import 'package:travelbook/layouts/main_layout.dart';
 import 'package:travelbook/screens/about_us.dart';
 import 'package:travelbook/screens/chat_bot.dart';
 import 'package:travelbook/screens/edit_profile.dart';
+import 'package:travelbook/screens/emergency_contact.dart';
 import 'package:travelbook/screens/home.dart';
 import 'package:travelbook/screens/log_in.dart';
 import 'package:travelbook/screens/newpost.dart';
@@ -112,6 +113,11 @@ final GoRouter router = GoRouter(
           path: '/privacy_policy',
           name: "/privacy_policy",
           builder: (context, state) => const PrivacyPolicyPage(),
+        ),
+        GoRoute(
+          path: '/emergency_contact',
+          name: "/emergency_contact",
+          builder: (context, state) => EmergencyContactPage(),
         ),
       ],
     ),
