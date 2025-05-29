@@ -25,15 +25,13 @@ class AboutUs extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    // Optional border
                   ),
                   child: ClipOval(
                     child: Image.asset(
                       "assets/images/logo.webp",
                       height: 80,
                       width: 80,
-                      fit: BoxFit
-                          .cover, // Ensures the image fits within the circular shape
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
@@ -81,7 +79,6 @@ class AboutUs extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
               ),
               const SizedBox(height: 20),
-              // Horizontal scrolling list for developers
               SizedBox(
                 height: 120,
                 child: SingleChildScrollView(
@@ -89,19 +86,19 @@ class AboutUs extends StatelessWidget {
                   child: Row(
                     children: [
                       _buildDeveloper(
-                          "Lakshan", "assets/images/developers/lakshan.png"),
+                          "Lakshan Rukantha", "assets/images/developers/lakshan.jpg"),
                       _buildDeveloper(
-                          "Sithija", "assets/images/developers/user.webp"),
+                          "Bethmina Sithija", "assets/images/developers/sithija.jpg"),
                       _buildDeveloper(
-                          "Sandaru", "assets/images/developers/user.webp"),
+                          "Sandaru Tharaka", "assets/images/developers/sandaru.jpg"),
                       _buildDeveloper(
-                          "Charith", "assets/images/developers/user.webp"),
+                          "Charith Wijesinghe", "assets/images/developers/charith.jpg"),
                       _buildDeveloper(
-                          "Hiruni", "assets/images/developers/user.webp"),
+                          "Hiruni Prarthana", "assets/images/developers/hiruni.jpg"),
                       _buildDeveloper(
-                          "Vidumini", "assets/images/developers/user.webp"),
+                          "Vidumini Prabodya", "assets/images/developers/vidumini.jpg"),
                       _buildDeveloper(
-                          "Meedum", "assets/images/developers/user.webp"),
+                          "Meedum Shanika", "assets/images/developers/meedum.jpg"),
                     ],
                   ),
                 ),
@@ -115,7 +112,7 @@ class AboutUs extends StatelessWidget {
 
   Widget _buildDeveloper(String name, String image) {
     return Padding(
-      padding: const EdgeInsets.only(right: 10), // Space between items
+      padding: const EdgeInsets.only(right: 10),
       child: Column(
         children: [
           Container(
