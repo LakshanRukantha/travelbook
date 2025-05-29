@@ -7,7 +7,12 @@ class AboutUs extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("About Us"),
+        title: const Text(
+          "About Us",
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.blue,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
         // Enables vertical scrolling
@@ -83,13 +88,20 @@ class AboutUs extends StatelessWidget {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      _buildDeveloper("Lakshan"),
-                      _buildDeveloper("Sithija"),
-                      _buildDeveloper("Sandaru"),
-                      _buildDeveloper("Charith"),
-                      _buildDeveloper("Hiruni"),
-                      _buildDeveloper("Vidumini"),
-                      _buildDeveloper("Meedum"),
+                      _buildDeveloper(
+                          "Lakshan", "assets/images/developers/lakshan.png"),
+                      _buildDeveloper(
+                          "Sithija", "assets/images/developers/user.webp"),
+                      _buildDeveloper(
+                          "Sandaru", "assets/images/developers/user.webp"),
+                      _buildDeveloper(
+                          "Charith", "assets/images/developers/user.webp"),
+                      _buildDeveloper(
+                          "Hiruni", "assets/images/developers/user.webp"),
+                      _buildDeveloper(
+                          "Vidumini", "assets/images/developers/user.webp"),
+                      _buildDeveloper(
+                          "Meedum", "assets/images/developers/user.webp"),
                     ],
                   ),
                 ),
@@ -101,7 +113,7 @@ class AboutUs extends StatelessWidget {
     );
   }
 
-  Widget _buildDeveloper(String name) {
+  Widget _buildDeveloper(String name, String image) {
     return Padding(
       padding: const EdgeInsets.only(right: 10), // Space between items
       child: Column(
@@ -113,7 +125,7 @@ class AboutUs extends StatelessWidget {
             ),
             child: ClipOval(
               child: Image.asset(
-                'assets/images/developers/user.webp',
+                image,
                 height: 70,
                 width: 70,
                 fit: BoxFit.cover,
