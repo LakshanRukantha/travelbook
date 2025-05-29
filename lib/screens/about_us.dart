@@ -45,38 +45,38 @@ class AboutUs extends StatelessWidget {
               const SizedBox(height: 10),
               const Text(
                 "TravelBook is a mobile app that helps Sri Lankan tourists plan trips, find reliable travel information, and connect with fellow explorers. It's your trusted companion for unforgettable adventures, from seaside getaways to cultural journeys across Sri Lanka.",
-                style: TextStyle(fontSize: 20),
+                style: TextStyle(fontSize: 18),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
               const Text(
                 "Support Number",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
               Row(
                 children: const [
                   Icon(Icons.phone),
                   SizedBox(width: 10),
-                  Text("0763721373", style: TextStyle(fontSize: 20)),
+                  Text("0763721373", style: TextStyle(fontSize: 18)),
                 ],
               ),
               const SizedBox(height: 20),
               const Text(
                 "Email",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
               Row(
                 children: const [
                   Icon(Icons.email),
                   SizedBox(width: 10),
                   Text("contact@travelbook.com",
-                      style: TextStyle(fontSize: 20)),
+                      style: TextStyle(fontSize: 18)),
                 ],
               ),
               const SizedBox(height: 20),
               const Text(
                 "Developers",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
               const SizedBox(height: 20),
               SizedBox(
@@ -85,22 +85,29 @@ class AboutUs extends StatelessWidget {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      _buildDeveloper(
-                          "Lakshan Rukantha", "assets/images/developers/lakshan.jpg"),
-                      _buildDeveloper(
-                          "Bethmina Sithija", "assets/images/developers/sithija.jpg"),
-                      _buildDeveloper(
-                          "Sandaru Tharaka", "assets/images/developers/sandaru.jpg"),
-                      _buildDeveloper(
-                          "Charith Wijesinghe", "assets/images/developers/charith.jpg"),
-                      _buildDeveloper(
-                          "Hiruni Prarthana", "assets/images/developers/hiruni.jpg"),
-                      _buildDeveloper(
-                          "Vidumini Prabodya", "assets/images/developers/vidumini.jpg"),
-                      _buildDeveloper(
-                          "Meedum Shanika", "assets/images/developers/meedum.jpg"),
+                      _buildDeveloper("Lakshan Rukantha",
+                          "assets/images/developers/lakshan.jpg"),
+                      _buildDeveloper("Bethmina Sithija",
+                          "assets/images/developers/sithija.jpg"),
+                      _buildDeveloper("Sandaru Tharaka",
+                          "assets/images/developers/sandaru.jpg"),
+                      _buildDeveloper("Charith Wijesinghe",
+                          "assets/images/developers/charith.jpg"),
+                      _buildDeveloper("Hiruni Prarthana",
+                          "assets/images/developers/hiruni.jpg"),
+                      _buildDeveloper("Vidumini Prabodya",
+                          "assets/images/developers/vidumini.jpg"),
+                      _buildDeveloper("Meedum Shanika",
+                          "assets/images/developers/meedum.jpg"),
                     ],
                   ),
+                ),
+              ),
+              SizedBox(
+                width: double.infinity,
+                child: Text(
+                  "v1.0.0-alpha",
+                  textAlign: TextAlign.center,
                 ),
               ),
             ],
