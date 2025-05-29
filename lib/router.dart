@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:travelbook/layouts/main_layout.dart';
+import 'package:travelbook/screens/about_us.dart';
 import 'package:travelbook/screens/chat_bot.dart';
 import 'package:travelbook/screens/edit_profile.dart';
 import 'package:travelbook/screens/home.dart';
@@ -95,6 +96,11 @@ final GoRouter router = GoRouter(
           path: '/settings',
           name: "/settings",
           builder: (context, state) => const SettingsPage(),
+        ),
+        GoRoute(
+          path: '/about',
+          name: "/about",
+          builder: (context, state) => const AboutUs(),
         ),
       ],
     ),

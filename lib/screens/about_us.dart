@@ -7,7 +7,12 @@ class AboutUs extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("About Us"),
+        title: const Text(
+          "About Us",
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.blue,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
         // Enables vertical scrolling
