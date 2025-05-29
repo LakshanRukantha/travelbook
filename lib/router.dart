@@ -8,6 +8,7 @@ import 'package:travelbook/screens/home.dart';
 import 'package:travelbook/screens/log_in.dart';
 import 'package:travelbook/screens/notifications.dart';
 import 'package:travelbook/screens/profile.dart';
+import 'package:travelbook/screens/settings.dart';
 import 'package:travelbook/screens/sign_up.dart';
 import 'package:travelbook/screens/test_screen.dart';
 import 'package:travelbook/router_refresh.dart';
@@ -89,6 +90,11 @@ final GoRouter router = GoRouter(
           path: '/weather',
           name: "weather",
           builder: (context, state) => WeatherPage(),
+        ),
+        GoRoute(
+          path: '/settings',
+          name: "/settings",
+          builder: (context, state) => const SettingsPage(),
         ),
       ],
     ),
