@@ -7,6 +7,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
 
 class ProfilePage extends StatefulWidget {
+  const ProfilePage({super.key});
+
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
@@ -45,7 +47,8 @@ class _ProfilePageState extends State<ProfilePage> {
       final currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser != null) {
         final uid = currentUser.uid;
-        final userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+        final userDoc =
+            await FirebaseFirestore.instance.collection('users').doc(uid).get();
         final userData = userDoc.data();
 
         setState(() {
@@ -103,11 +106,17 @@ class _ProfilePageState extends State<ProfilePage> {
       String fileName = 'profile_${currentUser.uid}.jpg';
 
       try {
-        final ref = FirebaseStorage.instance.ref().child('profile_images').child(fileName);
+        final ref = FirebaseStorage.instance
+            .ref()
+            .child('profile_images')
+            .child(fileName);
         await ref.putFile(imageFile);
         String downloadUrl = await ref.getDownloadURL();
 
-        await FirebaseFirestore.instance.collection('users').doc(currentUser.uid).update({'userImage': downloadUrl});
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser.uid)
+            .update({'userImage': downloadUrl});
         setState(() {
           userImage = downloadUrl;
         });
@@ -122,7 +131,8 @@ class _ProfilePageState extends State<ProfilePage> {
       onTap: onTap,
       child: Column(
         children: [
-          Text(count, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text(count,
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           Text(label, style: TextStyle(color: Colors.grey)),
         ],
       ),
@@ -139,17 +149,23 @@ class _ProfilePageState extends State<ProfilePage> {
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: image.startsWith("http")
-                  ? Image.network(image, width: 80, height: 80, fit: BoxFit.cover)
-                  : Image.asset(image, width: 80, height: 80, fit: BoxFit.cover),
+                  ? Image.network(image,
+                      width: 80, height: 80, fit: BoxFit.cover)
+                  : Image.asset(image,
+                      width: 80, height: 80, fit: BoxFit.cover),
             ),
             SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(text, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text(text,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontWeight: FontWeight.bold)),
                   SizedBox(height: 4),
-                  Text("$time  •  $likes Likes", style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                  Text("$time  •  $likes Likes",
+                      style: TextStyle(color: Colors.grey[600], fontSize: 12)),
                 ],
               ),
             ),
@@ -160,7 +176,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   final postQuery = await FirebaseFirestore.instance
                       .collection('posts')
                       .where('caption', isEqualTo: text)
-                      .where('posted_by', isEqualTo: FirebaseAuth.instance.currentUser?.email)
+                      .where('posted_by',
+                          isEqualTo: FirebaseAuth.instance.currentUser?.email)
                       .get();
 
                   for (var doc in postQuery.docs) {
@@ -205,10 +222,13 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
             SizedBox(height: 10),
-            Text(profileUsername, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(profileUsername,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             Text(profileEmail, style: TextStyle(color: Colors.grey)),
-            if (profileLocation.isNotEmpty) Text(profileLocation, style: TextStyle(color: Colors.grey[600])),
-            if (profileBio.isNotEmpty) Text(profileBio, style: TextStyle(fontStyle: FontStyle.italic)),
+            if (profileLocation.isNotEmpty)
+              Text(profileLocation, style: TextStyle(color: Colors.grey[600])),
+            if (profileBio.isNotEmpty)
+              Text(profileBio, style: TextStyle(fontStyle: FontStyle.italic)),
             ElevatedButton(
               onPressed: () => context.pushNamed("edit_profile"),
               child: Text("Edit Profile"),
@@ -233,14 +253,17 @@ class _ProfilePageState extends State<ProfilePage> {
               label: Text("Add Post"),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10),
-              child: Text("My Posts", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10),
+              child: Text("My Posts",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             ),
             isLoadingPosts
                 ? CircularProgressIndicator()
                 : userPosts.isEmpty
                     ? Text("No posts yet.")
-                    : Column(children: userPosts.map((post) {
+                    : Column(
+                        children: userPosts.map((post) {
                         return postItem(
                           post["caption"] ?? '',
                           post["likes"] ?? 0,
@@ -256,7 +279,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   String _formatTime(dynamic time) {
     try {
-      final postDate = time is Timestamp ? time.toDate() : DateTime.parse(time.toString());
+      final postDate =
+          time is Timestamp ? time.toDate() : DateTime.parse(time.toString());
       final now = DateTime.now();
       final difference = now.difference(postDate);
       if (difference.inDays > 0) return "${difference.inDays}d ago";

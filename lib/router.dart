@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:travelbook/layouts/main_layout.dart';
 import 'package:travelbook/screens/chat_bot.dart';
 import 'package:travelbook/screens/edit_profile.dart';
+import 'package:travelbook/screens/followers.dart';
+import 'package:travelbook/screens/followings.dart';
 import 'package:travelbook/screens/home.dart';
 import 'package:travelbook/screens/log_in.dart';
 import 'package:travelbook/screens/notifications.dart';
@@ -80,6 +82,22 @@ final GoRouter router = GoRouter(
           path: '/notifications',
           name: "notifications",
           builder: (context, state) => NotificationsPage(),
+        ),
+        GoRoute(
+          name: 'followers',
+          path: '/followers',
+          builder: (context, state) {
+            final emails = state.extra as List<String>? ?? [];
+            return FollowersPage(followerEmails: emails);
+          },
+        ),
+        GoRoute(
+          path: '/following',
+          name: "following",
+          builder: (context, state) {
+            final emails = state.extra as List<String>? ?? [];
+            return FollowingsPage(followingEmails: emails);
+          },
         ),
       ],
     ),
