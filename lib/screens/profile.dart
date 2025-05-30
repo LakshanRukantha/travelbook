@@ -1,16 +1,13 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
-import 'package:travelbook/screens/followers_page.dart';
-import 'package:travelbook/screens/following_page.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
-
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
@@ -24,10 +21,11 @@ class _ProfilePageState extends State<ProfilePage> {
   String profileLocation = "";
 
   int postsCount = 0;
-  List<String> followers = [];
-  List<String> following = [];
+  int followersCount = 0;
+  int followingCount = 0;
 
   final defaultImage = "assets/images/developers/user.webp";
+
   List<Map<String, dynamic>> userPosts = [];
 
   @override
@@ -46,7 +44,8 @@ class _ProfilePageState extends State<ProfilePage> {
       final currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser != null) {
         final uid = currentUser.uid;
-        final userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+        final userDoc =
+            await FirebaseFirestore.instance.collection('users').doc(uid).get();
         final userData = userDoc.data();
 
         setState(() {
@@ -55,8 +54,10 @@ class _ProfilePageState extends State<ProfilePage> {
           userImage = userData?['userImage'] ?? "";
           profileBio = userData?['bio'] ?? '';
           profileLocation = userData?['location'] ?? '';
-          followers = List<String>.from(userData?['followers'] ?? []);
-          following = List<String>.from(userData?['following'] ?? []);
+          followersCount =
+              (userData?['followers'] as List<dynamic>?)?.length ?? 0;
+          followingCount =
+              (userData?['following'] as List<dynamic>?)?.length ?? 0;
         });
       }
     } catch (e) {
@@ -76,12 +77,15 @@ class _ProfilePageState extends State<ProfilePage> {
         final querySnapshot = await FirebaseFirestore.instance
             .collection('posts')
             .where('posted_by', isEqualTo: userEmail)
+            // .orderBy('time', descending: true)
             .get();
 
         setState(() {
           postsCount = querySnapshot.docs.length;
           userPosts = querySnapshot.docs.map((doc) => doc.data()).toList();
         });
+      } else {
+        print("User email is null while fetching posts.");
       }
     } catch (e) {
       print('Error fetching posts: $e');
@@ -102,12 +106,18 @@ class _ProfilePageState extends State<ProfilePage> {
       String fileName = 'profile_${currentUser.uid}.jpg';
 
       try {
-        final ref = FirebaseStorage.instance.ref().child('profile_images').child(fileName);
+        final ref = FirebaseStorage.instance
+            .ref()
+            .child('profile_images')
+            .child(fileName);
         await ref.putFile(imageFile);
 
         String downloadUrl = await ref.getDownloadURL();
 
-        await FirebaseFirestore.instance.collection('users').doc(currentUser.uid).update({'userImage': downloadUrl});
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser.uid)
+            .update({'userImage': downloadUrl});
 
         setState(() {
           userImage = downloadUrl;
@@ -118,12 +128,13 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  Widget profileStat(String count, String label, VoidCallback? onTap) {
+  Widget profileStat(String count, String label, [VoidCallback? onTap]) {
     return GestureDetector(
       onTap: onTap,
       child: Column(
         children: [
-          Text(count, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text(count,
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           Text(label, style: TextStyle(color: Colors.grey)),
         ],
       ),
@@ -137,13 +148,18 @@ class _ProfilePageState extends State<ProfilePage> {
         padding: const EdgeInsets.all(8.0),
         child: Row(
           children: [
+            // Post image
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: image.startsWith("http")
-                  ? Image.network(image, width: 80, height: 80, fit: BoxFit.cover)
-                  : Image.asset(image, width: 80, height: 80, fit: BoxFit.cover),
+                  ? Image.network(image,
+                      width: 80, height: 80, fit: BoxFit.cover)
+                  : Image.asset(image,
+                      width: 80, height: 80, fit: BoxFit.cover),
             ),
             SizedBox(width: 12),
+
+            // Post details
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -162,50 +178,21 @@ class _ProfilePageState extends State<ProfilePage> {
                 ],
               ),
             ),
-            IconButton(
-              icon: Icon(Icons.delete, color: Colors.red),
-              onPressed: () async {
-                try {
-                  final postQuery = await FirebaseFirestore.instance
-                      .collection('posts')
-                      .where('caption', isEqualTo: text)
-                      .where('posted_by', isEqualTo: FirebaseAuth.instance.currentUser?.email)
-                      .get();
 
-                  for (var doc in postQuery.docs) {
-                    if (image.startsWith('https://')) {
-                      try {
-                        final ref = FirebaseStorage.instance.refFromURL(image);
-                        await ref.delete();
-                      } catch (e) {
-                        print('Error deleting image from storage: $e');
-                      }
-                    }
-                    await doc.reference.delete();
-                  }
-                  await fetchUserPosts();
-                } catch (e) {
-                  print('Error deleting post: $e');
-                }
-              },
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.delete, color: Colors.red),
+                  onPressed: () {
+                    // TODO: Function to delete post
+                  },
+                ),
+              ],
             ),
           ],
         ),
       ),
-    );
-  }
-
-  void openFollowersPage() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => FollowersPage(followers: followers, followerIds: [],)),
-    );
-  }
-
-  void openFollowingPage() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => FollowingPage(following: following, followingIds: [],)),
     );
   }
 
@@ -215,64 +202,116 @@ class _ProfilePageState extends State<ProfilePage> {
       appBar: AppBar(
         backgroundColor: Colors.blue,
         elevation: 0,
-        title: Text("Profile", style: TextStyle(color: Colors.white)),
+        title: Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            "Profile",
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start, // Left align by default
           children: [
             SizedBox(height: 20),
-            GestureDetector(
-              onTap: _changeProfilePicture,
-              child: CircleAvatar(
-                radius: 50,
-                backgroundImage: userImage.isNotEmpty
-                    ? NetworkImage(userImage)
-                    : AssetImage(defaultImage) as ImageProvider,
+            Center(
+              child: GestureDetector(
+                onTap: _changeProfilePicture,
+                child: CircleAvatar(
+                  radius: 50,
+                  backgroundImage: userImage.isNotEmpty
+                      ? NetworkImage(userImage)
+                      : AssetImage(defaultImage) as ImageProvider,
+                ),
               ),
             ),
             SizedBox(height: 10),
-            Text(profileUsername, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            Text(profileEmail, style: TextStyle(color: Colors.grey)),
+            Center(
+              child: Text(profileUsername,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            ),
+            Center(
+              child: Text(profileEmail, style: TextStyle(color: Colors.grey)),
+            ),
             if (profileLocation.isNotEmpty)
-              Text(profileLocation, style: TextStyle(color: Colors.grey[600])),
+              Center(
+                child: Text(profileLocation,
+                    style: TextStyle(color: Colors.grey[600])),
+              ),
             if (profileBio.isNotEmpty)
-              Text(profileBio, style: TextStyle(fontStyle: FontStyle.italic)),
-            ElevatedButton(
-              onPressed: () => context.pushNamed("edit_profile"),
-              child: Text("Edit Profile"),
+              Center(
+                child: Text(
+                  profileBio,
+                  style: TextStyle(fontStyle: FontStyle.italic),
+                ),
+              ),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  context.pushNamed("edit_profile");
+                },
+                child: Text("Edit Profile"),
+              ),
             ),
             SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                profileStat(postsCount.toString(), "Posts", null),
-                profileStat(followers.length.toString(), "Followers", openFollowersPage),
-                profileStat(following.length.toString(), "Following", openFollowingPage),
+                profileStat(postsCount.toString(), "Posts"),
+                profileStat(followersCount.toString(), "Followers"),
+                profileStat(followingCount.toString(), "Following"),
               ],
             ),
             SizedBox(height: 20),
-            ElevatedButton.icon(
-              onPressed: () => context.push("/new_post"),
-              icon: Icon(Icons.add),
-              label: Text("Add Post"),
+            Center(
+              child: ElevatedButton.icon(
+                onPressed: () async {
+                  context.push("/new_post");
+                },
+                icon: Icon(Icons.add),
+                label: Text("Add Post"),
+              ),
             ),
+            SizedBox(height: 10),
             Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text("My Posts", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                "My Posts",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
             ),
-            if (isLoadingPosts)
-              Center(child: CircularProgressIndicator())
-            else if (userPosts.isEmpty)
-              Center(child: Text("No posts yet.", style: TextStyle(color: Colors.grey)))
-            else
-              Column(children: userPosts.map((post) {
-                return postItem(
-                  post["caption"] ?? '',
-                  post["likes"] ?? 0,
-                  _formatTime(post["time"] ?? ''),
-                  post["image"] ?? '',
-                );
-              }).toList()),
+            isLoadingPosts
+                ? Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                : userPosts.isEmpty
+                    ? Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            CircularProgressIndicator(color: Colors.blue),
+                            SizedBox(height: 10),
+                            Text(
+                              "No posts yet.",
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.grey),
+                            ),
+                          ],
+                        ),
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: userPosts.map((post) {
+                          return postItem(
+                            post["caption"] ?? '',
+                            post["likes"] ?? 0,
+                            _formatTime(post["time"] ?? ''),
+                            post["image"] ?? '',
+                          );
+                        }).toList(),
+                      ),
           ],
         ),
       ),
@@ -281,7 +320,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   String _formatTime(dynamic time) {
     try {
-      final postDate = time is Timestamp ? time.toDate() : DateTime.parse(time.toString());
+      final postDate =
+          time is Timestamp ? time.toDate() : DateTime.parse(time.toString());
       final now = DateTime.now();
       final difference = now.difference(postDate);
 
