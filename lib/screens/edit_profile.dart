@@ -131,13 +131,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Edit Profile"),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
+        title: Text(
+          "Edit Profile",
+          style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.grey[300],
-        elevation: 0,
+        backgroundColor: Colors.blue,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -145,6 +144,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              SizedBox(
+                height: 18,
+              ),
               Center(
                 child: GestureDetector(
                   onTap: _pickAndUploadImage,
