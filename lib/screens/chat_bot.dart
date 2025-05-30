@@ -162,8 +162,8 @@ I am ${user!["name"].split(" ")[0] ?? "User"}: ${message.text}
 ''';
       final value = await gemini.prompt(parts: [Part.text(travelPrompt)]);
       print("Gemini response: ${value!.output}");
-      if (value?.output != null) {
-        accumulated += value!.output!
+      if (value.output != null) {
+        accumulated += value.output!
             .replaceAll('*', '')
             .replaceAll(' *', '')
             .replaceAllMapped(RegExp(r'([a-z])([A-Z])'),
