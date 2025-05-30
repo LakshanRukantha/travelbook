@@ -17,24 +17,25 @@ class AboutUs extends StatelessWidget {
       body: SingleChildScrollView(
         // Enables vertical scrolling
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.only(left: 20, right: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const SizedBox(height: 10),
               Center(
                 child: Container(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                   ),
                   child: Image.asset(
-                    "assets/images/logo.png",
-                    height: 80,
-                    width: 80,
+                    "assets/images/about_logo.png",
+                    height: 120,
+                    width: 120,
                     fit: BoxFit.cover,
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               const Divider(
                 height: 2,
                 color: Color.fromARGB(137, 2, 1, 1),
@@ -104,7 +105,7 @@ class AboutUs extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: Text(
-                  "v1.0.0-alpha",
+                  "v1.0.0-beta",
                   textAlign: TextAlign.center,
                 ),
               ),
