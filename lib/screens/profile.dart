@@ -5,8 +5,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
-import 'package:travelbook/screens/following_page.dart';
-import 'followers_page.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -22,8 +20,11 @@ class _ProfilePageState extends State<ProfilePage> {
   String profileLocation = "";
 
   int postsCount = 0;
-  List<String> followers = [];
-  List<String> following = [];
+  int followersCount = 0;
+  int followingCount = 0;
+
+  List<String> followersList = [];
+  List<String> followingList = [];
 
   final defaultImage = "assets/images/developers/user.webp";
   List<Map<String, dynamic>> userPosts = [];
@@ -53,8 +54,10 @@ class _ProfilePageState extends State<ProfilePage> {
           userImage = userData?['userImage'] ?? "";
           profileBio = userData?['bio'] ?? '';
           profileLocation = userData?['location'] ?? '';
-          followers = List<String>.from(userData?['followers'] ?? []);
-          following = List<String>.from(userData?['following'] ?? []);
+          followersList = List<String>.from(userData?['followers'] ?? []);
+          followingList = List<String>.from(userData?['following'] ?? []);
+          followersCount = followersList.length;
+          followingCount = followingList.length;
         });
       }
     } catch (e) {
@@ -102,11 +105,9 @@ class _ProfilePageState extends State<ProfilePage> {
       try {
         final ref = FirebaseStorage.instance.ref().child('profile_images').child(fileName);
         await ref.putFile(imageFile);
-
         String downloadUrl = await ref.getDownloadURL();
 
         await FirebaseFirestore.instance.collection('users').doc(currentUser.uid).update({'userImage': downloadUrl});
-
         setState(() {
           userImage = downloadUrl;
         });
@@ -116,7 +117,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  Widget profileStat(String count, String label, VoidCallback? onTap) {
+  Widget profileStat(String count, String label, [VoidCallback? onTap]) {
     return GestureDetector(
       onTap: onTap,
       child: Column(
@@ -146,17 +147,9 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    text,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
+                  Text(text, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.bold)),
                   SizedBox(height: 4),
-                  Text(
-                    "$time  •  $likes Likes",
-                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                  ),
+                  Text("$time  •  $likes Likes", style: TextStyle(color: Colors.grey[600], fontSize: 12)),
                 ],
               ),
             ),
@@ -181,6 +174,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     }
                     await doc.reference.delete();
                   }
+
                   await fetchUserPosts();
                 } catch (e) {
                   print('Error deleting post: $e');
@@ -193,28 +187,10 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  void openFollowersPage() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => FollowersPage(followers: followers, followerIds: [],)),
-    );
-  }
-
-  void openFollowingPage() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => FollowingPage(following: following, followingIds: [],)),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue,
-        elevation: 0,
-        title: Text("Profile", style: TextStyle(color: Colors.white)),
-      ),
+      appBar: AppBar(title: Text("Profile")),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -231,10 +207,8 @@ class _ProfilePageState extends State<ProfilePage> {
             SizedBox(height: 10),
             Text(profileUsername, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             Text(profileEmail, style: TextStyle(color: Colors.grey)),
-            if (profileLocation.isNotEmpty)
-              Text(profileLocation, style: TextStyle(color: Colors.grey[600])),
-            if (profileBio.isNotEmpty)
-              Text(profileBio, style: TextStyle(fontStyle: FontStyle.italic)),
+            if (profileLocation.isNotEmpty) Text(profileLocation, style: TextStyle(color: Colors.grey[600])),
+            if (profileBio.isNotEmpty) Text(profileBio, style: TextStyle(fontStyle: FontStyle.italic)),
             ElevatedButton(
               onPressed: () => context.pushNamed("edit_profile"),
               child: Text("Edit Profile"),
@@ -243,9 +217,13 @@ class _ProfilePageState extends State<ProfilePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                profileStat(postsCount.toString(), "Posts", null),
-                profileStat(followers.length.toString(), "Followers", openFollowersPage),
-                profileStat(following.length.toString(), "Following", openFollowingPage),
+                profileStat(postsCount.toString(), "Posts"),
+                profileStat(followersCount.toString(), "Followers", () {
+                  context.pushNamed("followers", extra: followersList);
+                }),
+                profileStat(followingCount.toString(), "Following", () {
+                  context.pushNamed("following", extra: followingList);
+                }),
               ],
             ),
             SizedBox(height: 20),
@@ -255,22 +233,21 @@ class _ProfilePageState extends State<ProfilePage> {
               label: Text("Add Post"),
             ),
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10),
               child: Text("My Posts", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             ),
-            if (isLoadingPosts)
-              Center(child: CircularProgressIndicator())
-            else if (userPosts.isEmpty)
-              Center(child: Text("No posts yet.", style: TextStyle(color: Colors.grey)))
-            else
-              Column(children: userPosts.map((post) {
-                return postItem(
-                  post["caption"] ?? '',
-                  post["likes"] ?? 0,
-                  _formatTime(post["time"] ?? ''),
-                  post["image"] ?? '',
-                );
-              }).toList()),
+            isLoadingPosts
+                ? CircularProgressIndicator()
+                : userPosts.isEmpty
+                    ? Text("No posts yet.")
+                    : Column(children: userPosts.map((post) {
+                        return postItem(
+                          post["caption"] ?? '',
+                          post["likes"] ?? 0,
+                          _formatTime(post["time"] ?? ''),
+                          post["image"] ?? '',
+                        );
+                      }).toList()),
           ],
         ),
       ),
@@ -282,7 +259,6 @@ class _ProfilePageState extends State<ProfilePage> {
       final postDate = time is Timestamp ? time.toDate() : DateTime.parse(time.toString());
       final now = DateTime.now();
       final difference = now.difference(postDate);
-
       if (difference.inDays > 0) return "${difference.inDays}d ago";
       if (difference.inHours > 0) return "${difference.inHours}h ago";
       if (difference.inMinutes > 0) return "${difference.inMinutes}m ago";
