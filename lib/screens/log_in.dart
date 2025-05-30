@@ -2,7 +2,6 @@ import 'package:go_router/go_router.dart';
 import 'package:travelbook/Widgets/button.dart';
 import 'package:travelbook/widgets/snack_bar.dart';
 import 'package:travelbook/widgets/text_field.dart';
-import 'package:travelbook/screens/sign_up.dart';
 import 'package:flutter/material.dart';
 
 import '../services/authentication.dart';
@@ -127,10 +126,7 @@ class _SignupscreenState extends State<Loginscreen> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => SignUpscreen()),
-                      );
+                      context.push("/signup");
                     },
                     child: const Text(
                       " SignUp",

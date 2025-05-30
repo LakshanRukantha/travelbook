@@ -3,8 +3,6 @@ import 'package:travelbook/Services/authentication.dart';
 import 'package:travelbook/widgets/button.dart';
 import 'package:travelbook/widgets/snack_bar.dart';
 import 'package:travelbook/widgets/text_field.dart';
-// import 'package:travelbook/screens/home.dart';
-import 'package:travelbook/screens/log_in.dart';
 import 'package:flutter/material.dart';
 
 class SignUpscreen extends StatefulWidget {
@@ -113,10 +111,7 @@ class _SignUpscreenState extends State<SignUpscreen> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => Loginscreen()),
-                      );
+                      context.push("/login");
                     },
                     child: const Text(
                       " Log in",

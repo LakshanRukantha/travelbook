@@ -16,7 +16,7 @@ class EditProfilePage extends StatefulWidget {
 
 class _EditProfilePageState extends State<EditProfilePage> {
   String userImage = "";
-  final defaultImage = "assets/images/developers/user.webp";
+  final defaultImage = "assets/images/developers/user_default.png";
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();

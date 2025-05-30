@@ -234,9 +234,20 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "Travel Book",
-          style: TextStyle(color: Colors.white),
+        title: RichText(
+          text: TextSpan(
+            style: TextStyle(color: Colors.white, fontSize: 24),
+            children: [
+              TextSpan(
+                text: 'Travel',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              TextSpan(
+                text: 'Book',
+                style: TextStyle(fontWeight: FontWeight.normal),
+              ),
+            ],
+          ),
         ),
         actions: [
           IconButton(
@@ -253,8 +264,31 @@ class _HomeState extends State<Home> {
                 case "weather_today":
                   context.push('/weather');
                   break;
+                case "emergency_contact":
+                  context.push('/emergency_contact');
+                  break;
                 case "sign_out":
-                  await AuthServices().signOutUser(context);
+                  final shouldSignOut = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Confirm Sign Out'),
+                      content: const Text('Are you sure you want to sign out?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => context.pop(false),
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () => context.pop(true),
+                          child: const Text('Sign Out'),
+                        ),
+                      ],
+                    ),
+                  );
+
+                  if (shouldSignOut == true) {
+                    await AuthServices().signOutUser(context);
+                  }
                   break;
                 default:
                   break;
@@ -268,6 +302,16 @@ class _HomeState extends State<Home> {
                     Icon(Icons.wb_sunny, color: Colors.black),
                     SizedBox(width: 8),
                     Text("Today's Weather"),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: "emergency_contact",
+                child: Row(
+                  children: [
+                    Icon(Icons.emergency, color: Colors.black),
+                    SizedBox(width: 8),
+                    Text("Emergency Hotlines"),
                   ],
                 ),
               ),

@@ -28,7 +28,7 @@ class _ProfilePageState extends State<ProfilePage> {
   List<String> followersList = [];
   List<String> followingList = [];
 
-  final defaultImage = "assets/images/developers/user.webp";
+  final defaultImage = "assets/images/developers/user_default.png";
   List<Map<String, dynamic>> userPosts = [];
 
   @override
